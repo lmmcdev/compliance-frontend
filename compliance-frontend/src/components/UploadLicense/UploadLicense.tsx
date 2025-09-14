@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { LicenseData } from '../../types';
+
+// Inline LicenseData type to avoid import issues
+interface LicenseData {
+  type: string;
+  issuer: string;
+  issueDate: string;
+  expirationDate: string;
+  documentUrl?: string;
+}
 
 const UploadLicense = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

@@ -1,5 +1,24 @@
 import { useState } from 'react';
-import { ComplianceCase, Document } from '../../types';
+
+// Inline types to avoid import issues
+interface ComplianceDocument {
+  id: string;
+  name: string;
+  url: string;
+  uploadDate: Date;
+  type: string;
+}
+
+interface ComplianceCase {
+  id: string;
+  title: string;
+  description: string;
+  status: 'open' | 'in-progress' | 'closed';
+  createdDate: Date;
+  updatedDate: Date;
+  documents: ComplianceDocument[];
+  notes: string;
+}
 
 const ComplianceForm = () => {
   const [formData, setFormData] = useState({

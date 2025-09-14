@@ -23,11 +23,11 @@ export interface ComplianceCase {
   status: 'open' | 'in-progress' | 'closed';
   createdDate: Date;
   updatedDate: Date;
-  documents: Document[];
+  documents: ComplianceDocument[];
   notes: string;
 }
 
-export interface Document {
+export interface ComplianceDocument {
   id: string;
   name: string;
   url: string;

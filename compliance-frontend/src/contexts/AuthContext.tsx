@@ -1,16 +1,11 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { PublicClientApplication, AccountInfo, AuthenticationResult } from '@azure/msal-browser';
-import { MsalProvider } from '@azure/msal-react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+// Mock MSAL configuration for testing
 export const msalConfig = {
   auth: {
-    clientId: import.meta.env.VITE_AZURE_CLIENT_ID || 'your-client-id',
-    authority: import.meta.env.VITE_AZURE_AUTHORITY || 'https://login.microsoftonline.com/your-tenant-id',
+    clientId: 'mock-client-id',
+    authority: 'mock-authority',
     redirectUri: window.location.origin,
-  },
-  cache: {
-    cacheLocation: 'localStorage',
-    storeAuthStateInCookie: false,
   },
 };
 
@@ -18,10 +13,8 @@ export const loginRequest = {
   scopes: ['User.Read', 'openid', 'profile'],
 };
 
-export const msalInstance = new PublicClientApplication(msalConfig);
-
 interface AuthContextType {
-  account: AccountInfo | null;
+  account: any | null;
   isAuthenticated: boolean;
   login: () => Promise<void>;
   logout: () => void;
@@ -35,76 +28,37 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [account, setAccount] = useState<AccountInfo | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      setAccount(accounts[0]);
-      setIsAuthenticated(true);
-    }
-  }, []);
+  // Mock authentication - always authenticated for testing
+  const [account] = useState<any>({ 
+    name: 'Test User',
+    username: 'test@company.com' 
+  });
+  const [isAuthenticated] = useState(true);
 
   const login = async () => {
-    try {
-      const result = await msalInstance.loginPopup(loginRequest);
-      setAccount(result.account);
-      setIsAuthenticated(true);
-      
-      if (result.accessToken) {
-        localStorage.setItem('accessToken', result.accessToken);
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
+    console.log('Mock login - already authenticated for testing');
   };
 
   const logout = () => {
-    msalInstance.logoutPopup();
-    setAccount(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('accessToken');
+    console.log('Mock logout - refresh page to test login flow');
   };
 
   const getAccessToken = async (): Promise<string | null> => {
-    if (!account) return null;
-
-    try {
-      const result: AuthenticationResult = await msalInstance.acquireTokenSilent({
-        ...loginRequest,
-        account,
-      });
-      
-      localStorage.setItem('accessToken', result.accessToken);
-      return result.accessToken;
-    } catch (error) {
-      console.error('Failed to acquire token silently:', error);
-      try {
-        const result = await msalInstance.acquireTokenPopup(loginRequest);
-        localStorage.setItem('accessToken', result.accessToken);
-        return result.accessToken;
-      } catch (popupError) {
-        console.error('Failed to acquire token via popup:', popupError);
-        return null;
-      }
-    }
+    return 'mock-access-token-for-testing';
   };
 
   return (
-    <MsalProvider instance={msalInstance}>
-      <AuthContext.Provider
-        value={{
-          account,
-          isAuthenticated,
-          login,
-          logout,
-          getAccessToken,
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
-    </MsalProvider>
+    <AuthContext.Provider
+      value={{
+        account,
+        isAuthenticated,
+        login,
+        logout,
+        getAccessToken,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
