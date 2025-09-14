@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.compliance-app.com';
 
@@ -11,7 +12,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config) => {
     const token = localStorage.getItem('accessToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -43,7 +44,7 @@ apiClient.interceptors.response.use(
       console.error('Access forbidden - insufficient permissions');
     }
     
-    if (error.response?.status >= 500) {
+    if ((error.response?.status ?? 0) >= 500) {
       console.error('Server error occurred');
     }
     

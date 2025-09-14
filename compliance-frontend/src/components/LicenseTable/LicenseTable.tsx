@@ -225,7 +225,6 @@ const LicenseTable = () => {
           }
           label="Delete"
           onClick={() => handleDelete(params.id as string)}
-          color="error"
         />,
       ],
     },
