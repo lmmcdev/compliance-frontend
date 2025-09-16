@@ -38,6 +38,7 @@ const menuItems = [
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated, account, logout } = useAuth();
   const location = useLocation();
+  console.log(account)
 
   const isActive = (path: string) => location.pathname === path;
 
