@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -13,12 +13,22 @@ import {
   ListItemText,
   Button,
   Container,
+  IconButton,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Description as LicenseIcon,
   CloudUpload as UploadIcon,
   Assignment as ComplianceIcon,
+  BarChart as ChartIcon,
+  People as PeopleIcon,
+  Settings as SettingsIcon,
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  MoreVert as MoreIcon,
+  Phone as PhoneIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -26,49 +36,26 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-const drawerWidth = 280;
+const drawerWidth = 60;
 
 const menuItems = [
-  { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-  { text: 'License Management', path: '/licenses', icon: <LicenseIcon /> },
-  { text: 'Upload License', path: '/upload', icon: <UploadIcon /> },
-  { text: 'Compliance Cases', path: '/compliance', icon: <ComplianceIcon /> },
+  { text: 'Call Logs', path: '/dashboard', icon: <PhoneIcon /> },
+  { text: 'Charts', path: '/charts', icon: <ChartIcon /> },
+  { text: 'People', path: '/people', icon: <PeopleIcon /> },
+  { text: 'Settings', path: '/settings', icon: <SettingsIcon /> },
+  { text: 'Licenses', path: '/licenses', icon: <LicenseIcon /> },
 ];
 
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated, account, logout } = useAuth();
   const location = useLocation();
-  console.log(account)
+  //console.log(account)
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: 'primary.main',
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Compliance Management System
-          </Typography>
-          
-          {isAuthenticated && account && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2">
-                Welcome, {account.name}
-              </Typography>
-              <Button color="inherit" onClick={logout} variant="outlined">
-                Logout
-              </Button>
-            </Box>
-          )}
-        </Toolbar>
-      </AppBar>
-
+    <Box sx={{ display: 'flex', height: '100vh', backgroundColor: '#f8f9fa', width: '100vw' }}>
+      {/* Sidebar */}
       {isAuthenticated && (
         <Drawer
           variant="permanent"
@@ -78,32 +65,50 @@ const Layout = ({ children }: LayoutProps) => {
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
+              backgroundColor: '#fff',
+              borderRight: '1px solid #e0e0e0',
+              boxShadow: 'none',
+              position: 'fixed',
+              left: 0,
+              top: 0,
+              height: '100vh',
             },
           }}
         >
-          <Toolbar />
-          <Box sx={{ overflow: 'auto' }}>
-            <List>
+          <Box sx={{ overflow: 'auto', py: 1 }}>
+            <List sx={{ px: 1 }}>
               {menuItems.map((item) => (
-                <ListItem key={item.text} disablePadding>
+                <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
                   <ListItemButton
                     component={Link}
                     to={item.path}
                     selected={isActive(item.path)}
                     sx={{
+                      minHeight: 48,
+                      justifyContent: 'center',
+                      px: 1.5,
+                      borderRadius: 1,
                       '&.Mui-selected': {
-                        backgroundColor: 'primary.light',
-                        color: 'white',
+                        backgroundColor: '#e3f2fd',
+                        color: '#1976d2',
                         '&:hover': {
-                          backgroundColor: 'primary.main',
+                          backgroundColor: '#bbdefb',
                         },
+                      },
+                      '&:hover': {
+                        backgroundColor: '#f5f5f5',
                       },
                     }}
                   >
-                    <ListItemIcon sx={{ color: isActive(item.path) ? 'white' : 'inherit' }}>
+                    <ListItemIcon
+                      sx={{
+                        color: isActive(item.path) ? '#1976d2' : '#666',
+                        minWidth: 0,
+                        justifyContent: 'center',
+                      }}
+                    >
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText primary={item.text} />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -112,18 +117,108 @@ const Layout = ({ children }: LayoutProps) => {
         </Drawer>
       )}
 
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          width: isAuthenticated ? `calc(100% - ${drawerWidth}px)` : '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          width: isAuthenticated ? `calc(100vw - ${drawerWidth}px)` : '100vw',
+          minHeight: '100vh',
+          marginLeft: isAuthenticated ? `${drawerWidth}px` : 0,
+          maxWidth: 'none',
         }}
       >
-        <Toolbar />
-        <Container maxWidth={false}>
+        {/* Top Bar */}
+        {isAuthenticated && (
+          <AppBar
+            position="static"
+            elevation={0}
+            sx={{
+              backgroundColor: '#fff',
+              borderBottom: '1px solid #e0e0e0',
+              boxShadow: 'none',
+            }}
+          >
+            <Toolbar sx={{ justifyContent: 'space-between', px: 3, width: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <TextField
+                  placeholder="mm/dd/yyyy"
+                  size="small"
+                  type="date"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#fff',
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  placeholder="Assigned to"
+                  size="small"
+                  select
+                  sx={{
+                    minWidth: 120,
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#fff',
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  placeholder="Caller ID"
+                  size="small"
+                  select
+                  sx={{
+                    minWidth: 120,
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#fff',
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <IconButton size="small" sx={{ color: '#666' }}>
+                  <SearchIcon />
+                </IconButton>
+                <IconButton size="small" sx={{ color: '#666' }}>
+                  <MoreIcon />
+                </IconButton>
+                <IconButton size="small" sx={{ color: '#666' }}>
+                  <PhoneIcon />
+                </IconButton>
+                <IconButton size="small" sx={{ color: '#666' }}>
+                  <MoreIcon />
+                </IconButton>
+                {account && (
+                  <Button
+                    onClick={logout}
+                    variant="text"
+                    size="small"
+                    sx={{ color: '#666', textTransform: 'none' }}
+                  >
+                    Logout
+                  </Button>
+                )}
+              </Box>
+            </Toolbar>
+          </AppBar>
+        )}
+
+        {/* Page Content */}
+        <Box sx={{
+          flexGrow: 1,
+          overflow: 'auto',
+          width: '100%',
+          maxWidth: 'none',
+          padding: 0,
+          margin: 0,
+        }}>
           {children}
-        </Container>
+        </Box>
       </Box>
     </Box>
   );

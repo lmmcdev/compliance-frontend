@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
+import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { theme } from './theme/theme';
 import Layout from './components/Layout/Layout';
@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import LicenseTable from './components/LicenseTable/LicenseTable';
 import UploadLicense from './components/UploadLicense/UploadLicense';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
+import AuthError from './components/AuthError/AuthError';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -21,9 +22,13 @@ const AppRoutes = () => {
   return (
     <Layout>
       <Routes>
-        <Route 
-          path="/login" 
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
+        />
+        <Route
+          path="/auth-error"
+          element={<AuthError />}
         />
         <Route
           path="/dashboard"
@@ -70,11 +75,13 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
+      <Box sx={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+        <AuthProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </Box>
     </ThemeProvider>
   );
 }
