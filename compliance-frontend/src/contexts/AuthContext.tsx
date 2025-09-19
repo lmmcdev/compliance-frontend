@@ -1,4 +1,5 @@
-import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { PublicClientApplication, AuthError as MsalAuthError } from '@azure/msal-browser';
 import { useMsal, useAccount } from '@azure/msal-react';
 
