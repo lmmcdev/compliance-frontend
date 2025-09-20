@@ -1,5 +1,5 @@
 import apiClient from '../middleware/httpInterceptor';
-import { License, LicenseData } from '../types';
+import type { License, LicenseData } from '../types';
 
 export const licenseService = {
   async getAllLicenses(): Promise<License[]> {

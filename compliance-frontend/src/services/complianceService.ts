@@ -1,5 +1,5 @@
 import apiClient from '../middleware/httpInterceptor';
-import { ComplianceCase, DashboardMetrics } from '../types';
+import type { ComplianceCase, DashboardMetrics } from '../types';
 
 export const complianceService = {
   async getAllComplianceCases(): Promise<ComplianceCase[]> {
