@@ -15,12 +15,16 @@ import {
   IconButton,
   CircularProgress,
   Skeleton,
+  Button,
 } from '@mui/material';
+import UploadLicenseDialog from '../dialogs/UploadLicenseDialog';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
+  CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import { licenseApi, type LicenseType } from './api';
 import EmptyState from '../../utils/EmptyState';
 
@@ -163,8 +167,25 @@ const LicenseTable = () => {
     }
   };
 
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const handleOpenUploadDialog = () => setUploadDialogOpen(true);
+  const handleCloseUploadDialog = () => setUploadDialogOpen(false);
+
   return (
-    <Box sx={{ width: '100%', px: 3, py: 2 }}>
+      <>
+        <Box sx={{ width: '100%', px: 3, py: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<CloudUploadIcon />}
+              sx={{ borderRadius: 2, fontWeight: 600, textTransform: 'none', boxShadow: 1 }}
+              onClick={handleOpenUploadDialog}
+            >
+              Upload License
+            </Button>
+          </Box>
+      
       <Typography
         variant="h4"
         gutterBottom
@@ -356,8 +377,10 @@ const LicenseTable = () => {
           </Table>
         </TableContainer>
       </Paper>
-    </Box>
-  );
+        </Box>
+        <UploadLicenseDialog open={uploadDialogOpen} onClose={handleCloseUploadDialog} />
+      </>
+    );
 };
 
 export default LicenseTable;

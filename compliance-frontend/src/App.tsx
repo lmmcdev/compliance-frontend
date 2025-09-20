@@ -7,7 +7,6 @@ import Layout from './components/Layout/Layout';
 import Login from './components/Login/Login';
 import Dashboard from './components/Dashboard/Dashboard';
 import LicenseTable from './components/LicenseTable/LicenseTable';
-import UploadLicense from './components/UploadLicense/UploadLicense';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
 import AuthError from './components/AuthError/AuthError';
 
@@ -43,14 +42,6 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <LicenseTable />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute>
-              <UploadLicense />
             </ProtectedRoute>
           }
         />

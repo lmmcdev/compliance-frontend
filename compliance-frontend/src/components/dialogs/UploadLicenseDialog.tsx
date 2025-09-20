@@ -1,4 +1,4 @@
-
+// Modern UploadLicense dialog component, moved to dialogs folder
 import React, { useState, useRef } from 'react';
 import {
   Box,
@@ -18,10 +18,24 @@ import { CloudUpload as CloudUploadIcon, Close as CloseIcon } from '@mui/icons-m
 // @ts-ignore
 import { BlobServiceClient } from '@azure/storage-blob';
 
-const DropArea = styled(Box)(({ theme, isdragover }: { theme?: any; isdragover?: boolean }) => ({
+const connectionString = `DefaultEndpointsProtocol=https;AccountName=lmmcaxis;AccountKey=ciCNr9pW3FZqQm89180xVZcwJ24qRKiW5mrm9tLk0TLVGB1y6H63Ko6qUiLtVLR5nEzg7Hwl4Z9h+AStSW1v4w==;EndpointSuffix=core.windows.net`;
+
+interface LicenseData {
+  field1: string;
+  field2: string;
+  field3: string;
+  field4: string;
+  field5: string;
+}
+
+const DropArea = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'dragover',
+})<{
+  dragover?: boolean;
+}>(({ theme, dragover }) => ({
   border: '2px dashed #90caf9',
   borderRadius: theme?.shape?.borderRadius || 8,
-  background: isdragover ? '#e3f2fd' : '#fafafa',
+  background: dragover ? '#e3f2fd' : '#fafafa',
   padding: theme?.spacing(4) || 32,
   textAlign: 'center',
   cursor: 'pointer',
@@ -33,18 +47,12 @@ const DropArea = styled(Box)(({ theme, isdragover }: { theme?: any; isdragover?:
   justifyContent: 'center',
 }));
 
-const connectionString = `DefaultEndpointsProtocol=https;AccountName=lmmcaxis;AccountKey=ciCNr9pW3FZqQm89180xVZcwJ24qRKiW5mrm9tLk0TLVGB1y6H63Ko6qUiLtVLR5nEzg7Hwl4Z9h+AStSW1v4w==;EndpointSuffix=core.windows.net`;
-
-interface LicenseData {
-  field1: string;
-  field2: string;
-  field3: string;
-  field4: string;
-  field5: string;
+interface UploadLicenseDialogProps {
+  open: boolean;
+  onClose: () => void;
 }
 
-const UploadLicense: React.FC = () => {
-  const [open, setOpen] = useState(true);
+const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -57,8 +65,6 @@ const UploadLicense: React.FC = () => {
     field5: '',
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleClose = () => setOpen(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -108,19 +114,19 @@ const UploadLicense: React.FC = () => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <CloudUploadIcon color="primary" />
           <Typography variant="h6" component="span">Subir Nueva Licencia</Typography>
         </Box>
-        <IconButton onClick={handleClose}>
+        <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent>
         <DropArea
-          isdragover={isDragOver}
+          dragover={isDragOver}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -159,20 +165,22 @@ const UploadLicense: React.FC = () => {
               Datos Adicionales de la Licencia
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Campo 1" name="field1" fullWidth value={additionalData.field1} onChange={handleDataChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Campo 2" name="field2" fullWidth value={additionalData.field2} onChange={handleDataChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Campo 3" name="field3" fullWidth value={additionalData.field3} onChange={handleDataChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Campo 4" name="field4" fullWidth value={additionalData.field4} onChange={handleDataChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Campo 5" name="field5" fullWidth value={additionalData.field5} onChange={handleDataChange} />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Campo 1" name="field1" fullWidth value={additionalData.field1} onChange={handleDataChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Campo 2" name="field2" fullWidth value={additionalData.field2} onChange={handleDataChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Campo 3" name="field3" fullWidth value={additionalData.field3} onChange={handleDataChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Campo 4" name="field4" fullWidth value={additionalData.field4} onChange={handleDataChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Campo 5" name="field5" fullWidth value={additionalData.field5} onChange={handleDataChange} />
+                </Grid>
               </Grid>
             </Grid>
             <Box sx={{ mt: 3 }}>
@@ -187,11 +195,12 @@ const UploadLicense: React.FC = () => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="secondary" variant="outlined" sx={{ borderRadius: 2 }}>
+        <Button onClick={onClose} color="secondary" variant="outlined" sx={{ borderRadius: 2 }}>
           Cancelar
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
-export default UploadLicense;
+
+export default UploadLicenseDialog;
