@@ -4,7 +4,6 @@ import {
   Box,
   Paper,
   Chip,
-  Tooltip,
   Alert,
   Table,
   TableBody,
@@ -13,18 +12,14 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  CircularProgress,
   Skeleton,
   Button,
 } from '@mui/material';
 import UploadLicenseDialog from '../dialogs/UploadLicenseDialog';
 import {
   Edit as EditIcon,
-  Delete as DeleteIcon,
-  Visibility as ViewIcon,
   CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
 import { licenseApi, type LicenseType } from './api';
 import EmptyState from '../../utils/EmptyState';
 
@@ -35,16 +30,6 @@ interface License {
   description: string;
   displayName: string;
   updatedAt: string;
-  _attachments?: string;
-  _etag?: string;
-  _rid?: string;
-  _self?: string;
-  _ts?: number;
-  // Additional fields for the table display
-  status?: string;
-  name?: string;
-  dob?: string;
-  phone?: string;
   location?: string;
   assignedTo?: string;
 }
@@ -63,15 +48,13 @@ const LicenseTable = () => {
 
 
         // Transform the API response to match our interface
-        const transformedLicenses: License[] = licenseTypes.map(license => ({
-          ...license,
-          // Set default values for display fields if not provided by API
-          status: license.status || 'Pending',
+        const transformedLicenses: License[] = licenseTypes.map((license: LicenseType) => ({
+          id: license.id,
           code: license.code || '—',
-          dob: license.displayName || '—',
-          phone: license.phone || '—',
-          location: license.location || license.description || 'SWITCHBOARD',
-          assignedTo: license.assignedTo || 'Unassigned',
+          createdAt: license.createdAt || '',
+          description: license.description || '—',
+          displayName: license.displayName || '—',
+          updatedAt: license.updatedAt || '',
         }));
 
         setLicenses(transformedLicenses);
@@ -95,13 +78,14 @@ const LicenseTable = () => {
         const licenseTypes = await licenseApi.getLicenseTypes();
 
         const transformedLicenses: License[] = licenseTypes.map(license => ({
-          ...license,
-          status: license.status || 'Pending',
-          name: license.name || '—',
-          dob: license.dob || '—',
-          phone: license.phone || '—',
-          location: license.location || license.description || 'SWITCHBOARD',
-          assignedTo: license.assignedTo || 'Unassigned',
+          id: license.id,
+          code: license.code || '—',
+          createdAt: license.createdAt || '',
+          description: license.description || '—',
+          displayName: license.displayName || '—',
+          updatedAt: license.updatedAt || '—',
+          // Copy any additional fields if present
+          ...(license.documentUrl ? { documentUrl: license.documentUrl } : {}),
         }));
 
         setLicenses(transformedLicenses);
@@ -117,7 +101,7 @@ const LicenseTable = () => {
     fetchLicenses();
   };
 
-  const getStatusColor = (status: string) => {
+  /*const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
         return 'success';
@@ -132,13 +116,13 @@ const LicenseTable = () => {
 
   const handleView = (id: string) => {
     console.log('View license:', id);
-  };
+  };*/
 
   const handleEdit = (id: string) => {
     console.log('Edit license:', id);
   };
 
-  const handleDelete = async (id: string) => {
+  /*const handleDelete = async (id: string) => {
     try {
       await licenseApi.deleteLicenseType(id);
       setLicenses(prev => prev.filter(license => license.id !== id));
@@ -146,7 +130,7 @@ const LicenseTable = () => {
       console.error('Failed to delete license:', err);
       setError('Failed to delete license. Please try again.');
     }
-  };
+  };*/
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '—';
@@ -218,28 +202,19 @@ const LicenseTable = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
-                  Status
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
-                  Flags
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
                   Location
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
+                  Code
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
                   Name
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
-                  
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
-                  
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
                   Created At
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
-                  Assigned To
+                  Updated At
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem', color: '#424242' }}>
                   Action
@@ -250,8 +225,6 @@ const LicenseTable = () => {
               {loading ? (
                 Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={index}>
-                    <TableCell><Skeleton variant="text" /></TableCell>
-                    <TableCell><Skeleton variant="text" /></TableCell>
                     <TableCell><Skeleton variant="text" /></TableCell>
                     <TableCell><Skeleton variant="text" /></TableCell>
                     <TableCell><Skeleton variant="text" /></TableCell>
@@ -283,19 +256,7 @@ const LicenseTable = () => {
                       },
                     }}
                   >
-                    <TableCell sx={{ py: 1.5 }}>
-                      <Chip
-                        label={license.status}
-                        color={license.status === 'Emergency' ? 'warning' : 'secondary'}
-                        size="small"
-                        sx={{
-                          backgroundColor: license.status === 'Emergency' ? '#fff3e0' : '#f3e5f5',
-                          color: license.status === 'Emergency' ? '#ff9800' : '#9c27b0',
-                          fontWeight: 500,
-                          fontSize: '0.75rem',
-                        }}
-                      />
-                    </TableCell>
+                    
                     <TableCell sx={{ py: 1.5 }}>
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
                         <Box
@@ -332,17 +293,7 @@ const LicenseTable = () => {
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>
                       <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {license.displayName || license.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 1.5 }}>
-                      <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {license.dob}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 1.5 }}>
-                      <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {license.phone}
+                        {license.displayName}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>
@@ -352,7 +303,7 @@ const LicenseTable = () => {
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>
                       <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                        {license.assignedTo}
+                        {license.updatedAt ? formatDate(license.updatedAt) : '—'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>

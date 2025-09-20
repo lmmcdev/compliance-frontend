@@ -12,11 +12,11 @@ const apiClient = axios.create({
 
 export interface LicenseType {
   id: string;
-  type: string;
-  issuer: string;
-  issueDate: string;
-  expirationDate: string;
-  status: 'active' | 'expired' | 'pending';
+  code: string;
+  createdAt: string;
+  description: string;
+  displayName: string;
+  updatedAt: string;
   documentUrl?: string;
 }
 

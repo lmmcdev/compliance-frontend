@@ -1,32 +1,24 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
-  Typography,
   Box,
   Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
   Button,
-  Container,
   IconButton,
   TextField,
-  InputAdornment,
 } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
   Description as LicenseIcon,
-  CloudUpload as UploadIcon,
-  Assignment as ComplianceIcon,
   BarChart as ChartIcon,
   People as PeopleIcon,
   Settings as SettingsIcon,
   Search as SearchIcon,
-  Notifications as NotificationsIcon,
   MoreVert as MoreIcon,
   Phone as PhoneIcon,
 } from '@mui/icons-material';

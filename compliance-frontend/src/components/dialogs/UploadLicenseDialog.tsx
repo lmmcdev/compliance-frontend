@@ -166,19 +166,19 @@ const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose
             </Typography>
             <Grid container spacing={2}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid>
                   <TextField label="Campo 1" name="field1" fullWidth value={additionalData.field1} onChange={handleDataChange} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid>
                   <TextField label="Campo 2" name="field2" fullWidth value={additionalData.field2} onChange={handleDataChange} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid>
                   <TextField label="Campo 3" name="field3" fullWidth value={additionalData.field3} onChange={handleDataChange} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid>
                   <TextField label="Campo 4" name="field4" fullWidth value={additionalData.field4} onChange={handleDataChange} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid>
                   <TextField label="Campo 5" name="field5" fullWidth value={additionalData.field5} onChange={handleDataChange} />
                 </Grid>
               </Grid>

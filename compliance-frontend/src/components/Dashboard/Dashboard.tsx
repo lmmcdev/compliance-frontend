@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Box, Grid, Typography, Container, Paper } from '@mui/material';
+import { Box, Typography, Container, Paper } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import StatusCard from '../StatusCard/StatusCard';
 import type { License } from '../../types';
 
@@ -15,10 +16,12 @@ interface DashboardMetrics {
   totalComplianceCases: number;
 }
 
+const DEFAULT_TOTAL_LICENSES = 501;
+
 const Dashboard = () => {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
-
+    // TODO: Fetch dashboard metrics from API endpoint, e.g. '/api/dashboard/metrics'
   useEffect(() => {
     // TODO: Fetch dashboard metrics from API
     const mockMetrics: DashboardMetrics = {
@@ -37,7 +40,7 @@ const Dashboard = () => {
         { month: 'May', count: 22 },
         { month: 'Jun', count: 18 },
       ],
-      totalLicenses: 501,
+      totalLicenses: DEFAULT_TOTAL_LICENSES,
       totalComplianceCases: 94,
     };
 
@@ -89,7 +92,7 @@ const Dashboard = () => {
       chipColor: '#ff9800',
     },
     {
-      count: metrics?.totalLicenses || 501,
+      count: metrics?.totalLicenses ?? DEFAULT_TOTAL_LICENSES,
       label: 'Total',
       status: 'total' as const,
       leftBorderColor: '#1976d2',
@@ -142,7 +145,7 @@ const Dashboard = () => {
 
       {/* Charts Section */}
       <Grid container spacing={3} sx={{ width: '100%' }}>
-        <Grid item xs={12} md={6}>
+        <Grid>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Licenses by Type
@@ -154,12 +157,12 @@ const Dashboard = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={(props: any) => `${props.name} ${(props.percent * 100).toFixed(0)}%`}
+                  label={(props: any) => `${props.name} ${props.percent !== undefined ? (props.percent * 100).toFixed(0) : '0'}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="count"
                 >
-                  {metrics.licensesByType.map((entry, index) => (
+                  {metrics.licensesByType.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -169,7 +172,7 @@ const Dashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               License Distribution
@@ -186,7 +189,7 @@ const Dashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               Compliance Cases per Month
