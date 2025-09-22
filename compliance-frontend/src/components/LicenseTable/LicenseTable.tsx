@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { licenseApi, type LicenseType } from './api';
 import EmptyState from '../../utils/EmptyState';
+import LicenseEdit from '../LicenseEdit/LicenseEdit';
 
 interface License {
   id: string;
@@ -37,6 +38,8 @@ const LicenseTable = () => {
   const [licenses, setLicenses] = useState<License[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingLicense, setEditingLicense] = useState<License | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const fetchLicenses = async () => {
@@ -118,7 +121,11 @@ const LicenseTable = () => {
   };*/
 
   const handleEdit = (id: string) => {
-    console.log('Edit license:', id);
+    const license = licenses.find(l => l.id === id);
+    if (license) {
+      setEditingLicense(license);
+      setIsEditMode(true);
+    }
   };
 
   /*const handleDelete = async (id: string) => {
