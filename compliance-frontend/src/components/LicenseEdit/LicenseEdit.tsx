@@ -153,7 +153,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
         }}
       >
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid>
             <TextField
               fullWidth
               label="License Code"
@@ -168,7 +168,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid>
             <TextField
               fullWidth
               label="Display Name"
@@ -183,7 +183,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid>
             <TextField
               fullWidth
               label="Description"
@@ -199,7 +199,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid>
             <Card
               sx={{
                 border: '1px solid #e0e0e0',
@@ -291,7 +291,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
           </Grid>
 
           {license && (
-            <Grid item xs={12}>
+            <Grid>
               <Box sx={{ display: 'flex', gap: 4, mt: 2 }}>
                 <Typography variant="body2" sx={{ color: '#757575' }}>
                   <strong>Created:</strong> {formatDate(formData.createdAt)}
@@ -303,7 +303,7 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
               <Button
                 variant="outlined"
