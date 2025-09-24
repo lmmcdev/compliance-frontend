@@ -1,5 +1,6 @@
 import apiClient from '../middleware/httpInterceptor';
 import type { License, LicenseData } from '../types';
+import { fileUploadService } from './fileUploadService';
 
 export const licenseService = {
   async getAllLicenses(): Promise<License[]> {
@@ -42,5 +43,10 @@ export const licenseService = {
   async extractLicenseData(documentUrl: string): Promise<LicenseData> {
     const response = await apiClient.post('/api/licenses/extract', { documentUrl });
     return response.data;
+  },
+
+  async uploadLicenseDocumentToStorage(file: File, metadata?: Record<string, any>): Promise<string> {
+    const result = await fileUploadService.uploadLicenseDocument(file, metadata);
+    return result.url;
   },
 };

@@ -5,7 +5,6 @@ import {
   Paper,
   TextField,
   Button,
-  IconButton,
   Alert,
   Grid,
   Card,
@@ -15,9 +14,8 @@ import {
 import {
   Save as SaveIcon,
   Cancel as CancelIcon,
-  CloudUpload as UploadIcon,
-  Description as DocumentIcon,
 } from '@mui/icons-material';
+import FileUpload from '../common/FileUpload';
 
 interface License {
   id: string;
@@ -58,10 +56,9 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
     setError(null);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileUpload = (file: File | null) => {
+    setUploadedFile(file);
     if (file) {
-      setUploadedFile(file);
       setError(null);
     }
   };
@@ -221,71 +218,14 @@ const LicenseEdit = ({ license, onSave, onCancel }: LicenseEditProps) => {
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
 
-                <Box
-                  sx={{
-                    border: '2px dashed #e0e0e0',
-                    borderRadius: 1,
-                    p: 3,
-                    textAlign: 'center',
-                    backgroundColor: '#fff',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: '#2196f3',
-                      backgroundColor: '#f5f5f5',
-                    },
-                  }}
-                >
-                  <input
-                    type="file"
-                    id="document-upload"
-                    style={{ display: 'none' }}
-                    onChange={handleFileUpload}
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  />
-                  <label htmlFor="document-upload" style={{ cursor: 'pointer' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                      <UploadIcon sx={{ fontSize: 48, color: '#2196f3' }} />
-                      <Typography variant="body1" sx={{ fontWeight: 500, color: '#424242' }}>
-                        Click to upload document
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#757575' }}>
-                        Supported formats: PDF, DOC, DOCX, JPG, PNG
-                      </Typography>
-                    </Box>
-                  </label>
-                </Box>
-
-                {uploadedFile && (
-                  <Box
-                    sx={{
-                      mt: 2,
-                      p: 2,
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 1,
-                      backgroundColor: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                    }}
-                  >
-                    <DocumentIcon sx={{ color: '#2196f3' }} />
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {uploadedFile.name}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#757575' }}>
-                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </Typography>
-                    </Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => setUploadedFile(null)}
-                      sx={{ color: '#f44336' }}
-                    >
-                      <CancelIcon />
-                    </IconButton>
-                  </Box>
-                )}
+                <FileUpload
+                  file={uploadedFile}
+                  onFileChange={handleFileUpload}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  label="Click to upload document"
+                  description="Supported formats: PDF, DOC, DOCX, JPG, PNG"
+                  allowDrop={true}
+                />
               </CardContent>
             </Card>
           </Grid>

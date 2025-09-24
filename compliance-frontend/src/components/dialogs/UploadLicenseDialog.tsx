@@ -1,5 +1,5 @@
 // Modern UploadLicense dialog component, moved to dialogs folder
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -11,14 +11,12 @@ import {
   DialogActions,
   CircularProgress,
   Grid,
-  IconButton
+  IconButton,
+  Alert
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { CloudUpload as CloudUploadIcon, Close as CloseIcon } from '@mui/icons-material';
-// @ts-ignore
-import { BlobServiceClient } from '@azure/storage-blob';
-
-const connectionString = `DefaultEndpointsProtocol=https;AccountName=lmmcaxis;AccountKey=ciCNr9pW3FZqQm89180xVZcwJ24qRKiW5mrm9tLk0TLVGB1y6H63Ko6qUiLtVLR5nEzg7Hwl4Z9h+AStSW1v4w==;EndpointSuffix=core.windows.net`;
+import { CloudUpload as CloudUploadIcon, Close as CloseIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { fileUploadService } from '../../services/fileUploadService';
+import FileUpload from '../common/FileUpload';
 
 interface LicenseData {
   field1: string;
@@ -28,24 +26,6 @@ interface LicenseData {
   field5: string;
 }
 
-const DropArea = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'dragover',
-})<{
-  dragover?: boolean;
-}>(({ theme, dragover }) => ({
-  border: '2px dashed #90caf9',
-  borderRadius: theme?.shape?.borderRadius || 8,
-  background: dragover ? '#e3f2fd' : '#fafafa',
-  padding: theme?.spacing(4) || 32,
-  textAlign: 'center',
-  cursor: 'pointer',
-  transition: 'background 0.2s',
-  color: '#1976d2',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
 
 interface UploadLicenseDialogProps {
   open: boolean;
@@ -54,9 +34,9 @@ interface UploadLicenseDialogProps {
 
 const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [additionalData, setAdditionalData] = useState<LicenseData>({
     field1: '',
     field2: '',
@@ -64,44 +44,21 @@ const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose
     field4: '',
     field5: '',
   });
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
 
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
+    setUploadSuccess(false);
     try {
-      const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-      const containerClient = blobServiceClient.getContainerClient('licenses');
-      await containerClient.createIfNotExists();
-      const blockBlobClient = containerClient.getBlockBlobClient(file.name);
-      await blockBlobClient.uploadBrowserData(file);
-      setUploadedUrl(blockBlobClient.url);
+      const result = await fileUploadService.uploadLicenseDocument(file, {
+        author: 'user',
+        purpose: 'license_upload'
+      });
+      setUploadedUrl(result.url);
+      setUploadSuccess(true);
     } catch (error) {
-      alert('Upload failed: ' + error);
+      console.error('Upload failed:', error);
+      alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
     setUploading(false);
   };
@@ -125,40 +82,45 @@ const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <DropArea
-          dragover={isDragOver}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-          sx={{ mb: 3 }}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/pdf,image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-          <CloudUploadIcon sx={{ fontSize: 48, mb: 1 }} />
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            Arrastra y Suelta el archivo aquí
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            o haz clic para seleccionar
-          </Typography>
-          {file && <Typography sx={{ mt: 2 }}>{file.name}</Typography>}
-        </DropArea>
+        <FileUpload
+          file={file}
+          onFileChange={setFile}
+          accept="application/pdf,image/*"
+          label="Arrastra y Suelta el archivo aquí o haz clic para seleccionar"
+          description="Formatos soportados: PDF, JPG, PNG"
+          uploading={uploading}
+        />
         <Button
           variant="contained"
           color="primary"
           disabled={!file || uploading}
           onClick={handleUpload}
           fullWidth
-          sx={{ py: 1.5, fontWeight: 600, borderRadius: 2 }}
+          sx={{ py: 1.5, fontWeight: 600, borderRadius: 2, mb: 2 }}
         >
           {uploading ? <CircularProgress size={24} /> : 'Subir Licencia'}
         </Button>
+
+        {uploadSuccess && (
+          <Alert
+            severity="success"
+            icon={<CheckCircleIcon />}
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              '& .MuiAlert-icon': {
+                fontSize: '1.5rem'
+              }
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              ¡Archivo subido exitosamente!
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'success.dark' }}>
+              El documento se ha cargado correctamente y está listo para procesar.
+            </Typography>
+          </Alert>
+        )}
         {uploadedUrl && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h6" gutterBottom>
