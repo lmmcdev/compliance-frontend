@@ -260,7 +260,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <LicenseDataDisplay
           licenseData={licenseData}
           loading={isUploading}
-          error={uploadError}
+          error={uploadError || undefined}
         />
       )}
     </Box>

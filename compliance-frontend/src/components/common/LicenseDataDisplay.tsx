@@ -4,7 +4,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   Chip,
   Divider,
   Alert,
@@ -117,36 +116,28 @@ const LicenseDataDisplay: React.FC<LicenseDataDisplayProps> = ({
       {/* Metadata */}
       <Card sx={{ mb: 3, backgroundColor: '#f8f9fa' }}>
         <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Model:</strong> {modelId}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Pages:</strong> {pages}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Documents:</strong> {documentsCount}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Processed:</strong> {new Date(licenseData.data.timestamp).toLocaleString()}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Model:</strong> {modelId}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Pages:</strong> {pages}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Documents:</strong> {documentsCount}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Processed:</strong> {new Date(licenseData.data.timestamp).toLocaleString()}
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
 
       {/* Dynamic Fields */}
       {validFields.length > 0 ? (
-        <Grid container spacing={2}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2 }}>
           {validFields.map((field, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Box key={index}>
               <FieldCard>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
@@ -170,9 +161,9 @@ const LicenseDataDisplay: React.FC<LicenseDataDisplayProps> = ({
                   )}
                 </CardContent>
               </FieldCard>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
         <Alert severity="info">
           No valid fields were extracted from the document.

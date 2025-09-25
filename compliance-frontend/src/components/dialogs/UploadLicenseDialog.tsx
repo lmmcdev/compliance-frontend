@@ -9,14 +9,10 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
-  Grid,
   IconButton,
-  Alert,
   Card,
   CardContent,
   Chip,
-  Divider,
-  Paper,
   Stepper,
   Step,
   StepLabel,
@@ -31,7 +27,6 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
 } from '@mui/icons-material';
-import { fileUploadService } from '../../services/fileUploadService';
 import FileUpload from '../common/FileUpload';
 
 interface LicenseField {
@@ -263,37 +258,29 @@ const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
                     Document Analysis Summary
                   </Typography>
-                  <Grid container spacing={3}>
-                    <Grid>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Model:</strong> {licenseData.data.analyzeResult.modelId}
-                      </Typography>
-                    </Grid>
-                    <Grid>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Pages:</strong> {licenseData.data.result.pages}
-                      </Typography>
-                    </Grid>
-                    <Grid>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Fields:</strong> {licenseData.data.result.fields.filter(f => f.value?.trim()).length}
-                      </Typography>
-                    </Grid>
-                    <Grid>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Processed:</strong> {new Date(licenseData.data.timestamp).toLocaleDateString()}
-                      </Typography>
-                    </Grid>
-                  </Grid>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Model:</strong> {licenseData.data.analyzeResult.modelId}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Pages:</strong> {licenseData.data.result.pages}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Fields:</strong> {licenseData.data.result.fields.filter(f => f.value?.trim()).length}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Processed:</strong> {new Date(licenseData.data.timestamp).toLocaleDateString()}
+                    </Typography>
+                  </Box>
                 </CardContent>
               </Card>
 
               {/* Editable Fields */}
-              <Grid container spacing={3}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
                 {licenseData.data.result.fields
                   .filter(field => field.value && field.value.trim() !== '')
-                  .map((field, index) => (
-                    <Grid>
+                  .map((field) => (
+                    <Box key={field.name}>
                       <FieldCard>
                         <CardContent>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -357,9 +344,9 @@ const UploadLicenseDialog: React.FC<UploadLicenseDialogProps> = ({ open, onClose
                           )}
                         </CardContent>
                       </FieldCard>
-                    </Grid>
+                    </Box>
                   ))}
-              </Grid>
+              </Box>
             </Box>
           )}
 
