@@ -4,6 +4,8 @@ import {
   Typography,
   CircularProgress,
   IconButton,
+  Button,
+  Alert,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -11,6 +13,8 @@ import {
   Description as DocumentIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
+import { fileUploadService } from '../../services/fileUploadService';
+import LicenseDataDisplay from './LicenseDataDisplay';
 
 export interface FileUploadProps {
   file: File | null;
@@ -22,6 +26,8 @@ export interface FileUploadProps {
   uploading?: boolean;
   allowDrop?: boolean;
   disabled?: boolean;
+  showUploadButton?: boolean;
+  onUploadComplete?: (response: any) => void;
 }
 
 const DropArea = styled(Box, {
@@ -71,14 +77,21 @@ const FileUpload: React.FC<FileUploadProps> = ({
   uploading = false,
   allowDrop = true,
   disabled = false,
+  showUploadButton = true,
+  onUploadComplete,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [licenseData, setLicenseData] = React.useState<any>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile && validateFile(selectedFile)) {
       onFileChange(selectedFile);
+      setLicenseData(null);
+      setUploadError(null);
     }
   };
 
@@ -122,8 +135,37 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleRemoveFile = () => {
     onFileChange(null);
+    setLicenseData(null);
+    setUploadError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+    setLicenseData(null);
+
+    try {
+      const result = await fileUploadService.uploadLicenseDocument(file, {
+        author: 'user',
+        purpose: 'license_upload',
+      });
+
+      if (result.webhookResponse) {
+        setLicenseData(result.webhookResponse);
+      }
+
+      if (onUploadComplete) {
+        onUploadComplete(result);
+      }
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -169,26 +211,57 @@ const FileUpload: React.FC<FileUploadProps> = ({
           )}
         </DropArea>
       ) : (
-        <FileDisplay>
-          <DocumentIcon sx={{ color: '#1976d2' }} />
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {file.name}
-            </Typography>
-            <Typography variant="caption" sx={{ color: '#757575' }}>
-              {formatFileSize(file.size)}
-            </Typography>
-          </Box>
-          {!disabled && !uploading && (
-            <IconButton
-              onClick={handleRemoveFile}
-              size="small"
-              color="error"
-            >
-              <DeleteIcon />
-            </IconButton>
+        <>
+          <FileDisplay>
+            <DocumentIcon sx={{ color: '#1976d2' }} />
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {file.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#757575' }}>
+                {formatFileSize(file.size)}
+              </Typography>
+            </Box>
+            {!disabled && !uploading && !isUploading && (
+              <IconButton
+                onClick={handleRemoveFile}
+                size="small"
+                color="error"
+              >
+                <DeleteIcon />
+              </IconButton>
+            )}
+          </FileDisplay>
+
+          {showUploadButton && (
+            <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                onClick={handleUpload}
+                disabled={disabled || uploading || isUploading}
+                startIcon={isUploading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
+                fullWidth
+              >
+                {isUploading ? 'Processing...' : 'Upload and Analyze Document'}
+              </Button>
+            </Box>
           )}
-        </FileDisplay>
+
+          {uploadError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {uploadError}
+            </Alert>
+          )}
+        </>
+      )}
+
+      {/* Display License Data */}
+      {licenseData && (
+        <LicenseDataDisplay
+          licenseData={licenseData}
+          loading={isUploading}
+          error={uploadError}
+        />
       )}
     </Box>
   );
