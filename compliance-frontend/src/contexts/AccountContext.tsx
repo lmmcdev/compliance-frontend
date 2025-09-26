@@ -24,6 +24,7 @@ interface AccountContextValue {
     setQuery: (query: string) => void;
     clearSearch: () => void;
     refetch: () => Promise<void>;
+    reset: () => void;
   };
 
   // Mutation operations
@@ -193,6 +194,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({ children }) =>
       setQuery: accountsSearch.setQuery,
       clearSearch: accountsSearch.clearSearch,
       refetch: accountsSearch.refetch,
+      reset: accountsSearch.reset,
     },
 
     operations: {
