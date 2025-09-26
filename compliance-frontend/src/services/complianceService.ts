@@ -1,4 +1,4 @@
-import apiClient from '../middleware/httpInterceptor';
+import { apiClient } from '../middleware/apiClient';
 import type { ComplianceCase, DashboardMetrics } from '../types';
 
 export const complianceService = {

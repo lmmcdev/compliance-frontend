@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
-import { LicenseData } from '../../../types/license';
+import type { LicenseData } from '../../../types/license';
 import { extractMetadata, getFieldCount } from '../../../utils/licenseDataParser';
 
 interface LicenseMetadataProps {

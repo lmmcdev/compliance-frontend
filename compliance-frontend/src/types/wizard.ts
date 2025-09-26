@@ -24,8 +24,8 @@ export interface WizardActions {
 }
 
 export interface StepComponentProps {
-  onNext: () => void;
-  onPrevious: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
   onStepChange?: (stepIndex: number) => void;
   isActive: boolean;
   isCompleted: boolean;

@@ -8,7 +8,6 @@ import {
 import { styled } from '@mui/material/styles';
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { Account } from '../../services/accountsService';
-import { LicenseData } from '../../types/license';
 import { WIZARD_STEPS } from '../../types/wizard';
 import { useWizardFlow } from '../../hooks/useWizardFlow';
 import { useLicenseUpload } from '../../hooks/useLicenseUpload';

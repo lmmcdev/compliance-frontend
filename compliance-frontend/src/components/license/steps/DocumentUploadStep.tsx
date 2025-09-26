@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import FileUpload from '../../common/FileUpload';
 import { WizardNavigation } from '../common/WizardNavigation';
-import { StepComponentProps } from '../../../types/wizard';
+import type { StepComponentProps } from '../../../types/wizard';
 
 interface DocumentUploadStepProps extends StepComponentProps {
   onUploadComplete: (response: any) => void;

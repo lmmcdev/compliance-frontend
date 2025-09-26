@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import AccountSelection from '../../common/AccountSelection';
 import { WizardNavigation } from '../common/WizardNavigation';
-import { StepComponentProps } from '../../../types/wizard';
+import type { StepComponentProps } from '../../../types/wizard';
 import type { Account } from '../../../services/accountsService';
 
 interface AccountSelectStepProps extends StepComponentProps {

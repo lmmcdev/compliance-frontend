@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { LicenseData } from '../../../types/license';
+import type { LicenseData } from '../../../types/license';
 import { useLicenseFields } from '../../../hooks/useLicenseFields';
 import { LicenseMetadata } from '../fields/LicenseMetadata';
 import { LicenseFieldList } from '../fields/LicenseFieldList';
 import { WizardNavigation } from '../common/WizardNavigation';
-import { StepComponentProps } from '../../../types/wizard';
+import type { StepComponentProps } from '../../../types/wizard';
 
 interface DataReviewStepProps extends StepComponentProps {
   licenseData: LicenseData;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Card } from '@mui/material';
-import { LicenseField } from '../../../types/license';
+import type { LicenseField } from '../../../types/license';
 import { LicenseFieldCard } from './LicenseFieldCard';
 
 interface LicenseFieldListProps {

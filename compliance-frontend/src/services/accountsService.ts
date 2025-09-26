@@ -1,4 +1,4 @@
-import azureFunctionsClient from '../middleware/azureFunctionsClient';
+import { apiClient } from '../middleware/apiClient';
 
 export interface Account {
   id: string;
@@ -47,7 +47,7 @@ export const accountsService = {
     if (filters?.continuationToken) queryParams.append('continuationToken', filters.continuationToken);
 
     const endpoint = `/accounts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    const response = await azureFunctionsClient.get<ApiResponse<AccountsData>>(endpoint);
+    const response = await apiClient.get<ApiResponse<AccountsData>>(endpoint);
 
     return {
       accounts: response.data.data.items,
@@ -59,7 +59,7 @@ export const accountsService = {
    * Get account by ID
    */
   async getAccountById(id: string): Promise<Account> {
-    const response = await azureFunctionsClient.get<ApiResponse<Account>>(`/accounts/${encodeURIComponent(id)}`);
+    const response = await apiClient.get<ApiResponse<Account>>(`/accounts/${encodeURIComponent(id)}`);
     return response.data.data;
   },
 
@@ -67,7 +67,7 @@ export const accountsService = {
    * Create new account
    */
   async createAccount(account: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>): Promise<Account> {
-    const response = await azureFunctionsClient.post<ApiResponse<Account>>('/accounts', account);
+    const response = await apiClient.post<ApiResponse<Account>>('/accounts', account);
     return response.data.data;
   },
 
@@ -75,7 +75,7 @@ export const accountsService = {
    * Update existing account
    */
   async updateAccount(id: string, updates: Partial<Omit<Account, 'id' | 'createdAt'>>): Promise<Account> {
-    const response = await azureFunctionsClient.patch<ApiResponse<Account>>(`/accounts/${encodeURIComponent(id)}`, updates);
+    const response = await apiClient.patch<ApiResponse<Account>>(`/accounts/${encodeURIComponent(id)}`, updates);
     return response.data.data;
   },
 
@@ -83,7 +83,7 @@ export const accountsService = {
    * Delete account
    */
   async deleteAccount(id: string): Promise<void> {
-    await azureFunctionsClient.delete(`/accounts/${encodeURIComponent(id)}`);
+    await apiClient.delete(`/accounts/${encodeURIComponent(id)}`);
   },
 
   /**
@@ -100,7 +100,7 @@ export const accountsService = {
     if (filters?.limit) queryParams.append('limit', filters.limit.toString());
 
     const endpoint = `/accounts/search?${queryParams.toString()}`;
-    const response = await azureFunctionsClient.get<ApiResponse<AccountsData>>(endpoint);
+    const response = await apiClient.get<ApiResponse<AccountsData>>(endpoint);
 
     return {
       accounts: response.data.data.items,
@@ -112,7 +112,7 @@ export const accountsService = {
    * Bulk operations for accounts
    */
   async bulkCreateAccounts(accounts: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<Account[]> {
-    const response = await azureFunctionsClient.post<ApiResponse<Account[]>>('/accounts/bulk', { accounts });
+    const response = await apiClient.post<ApiResponse<Account[]>>('/accounts/bulk', { accounts });
     return response.data.data;
   },
 
@@ -123,7 +123,7 @@ export const accountsService = {
     total: number;
     byType: Record<string, number>;
   }> {
-    const response = await azureFunctionsClient.get<ApiResponse<{
+    const response = await apiClient.get<ApiResponse<{
       total: number;
       byType: Record<string, number>;
     }>>('/accounts/stats');

@@ -43,7 +43,6 @@ export const useLicenseFields = (licenseData: LicenseData | null) => {
       };
 
       // Check if there are changes from original values
-      const originalField = fields.find(f => f.name === fieldName);
       const hasChanges = Object.keys(newEditableFields).some(name => {
         const original = fields.find(f => f.name === name);
         return original && newEditableFields[name] !== original.value;

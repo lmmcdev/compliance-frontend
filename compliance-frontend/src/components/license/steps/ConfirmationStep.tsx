@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { WizardNavigation } from '../common/WizardNavigation';
-import { StepComponentProps } from '../../../types/wizard';
+import type { StepComponentProps } from '../../../types/wizard';
 
 interface ConfirmationStepProps extends StepComponentProps {
   onSave: () => void;

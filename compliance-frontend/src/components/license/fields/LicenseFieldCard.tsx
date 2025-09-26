@@ -14,7 +14,7 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
 } from '@mui/icons-material';
-import { LicenseField } from '../../../types/license';
+import type { LicenseField } from '../../../types/license';
 import { getConfidenceColor, formatConfidence } from '../../../utils/fieldExtractor';
 
 const FieldCard = styled(Card)(({ theme }) => ({
@@ -27,9 +27,11 @@ const FieldCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-const ConfidenceChip = styled(Chip)<{ confidence: number }>(({ theme, confidence }) => ({
+const ConfidenceChip = styled(Chip)<{ confidence: number }>(({ confidence }) => ({
   fontWeight: 600,
   fontSize: '0.75rem',
+  backgroundColor: confidence >= 0.8 ? '#4caf50' : confidence >= 0.6 ? '#ff9800' : '#f44336',
+  color: 'white',
 }));
 
 interface LicenseFieldCardProps {

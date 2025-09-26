@@ -1,3 +1,6 @@
+import { apiClient } from '../middleware/apiClient';
+import type { AxiosError } from 'axios';
+
 export interface Account {
   id: string;
   name: string;
@@ -22,42 +25,45 @@ export interface CosmosDbResponse<T> {
   statusCode?: number;
 }
 
-const COSMOS_API_BASE_URL = process.env.REACT_APP_COSMOS_API_URL || 'https://your-cosmos-api.azurewebsites.net';
-
 class CosmosDbService {
   private async makeRequest<T>(
     endpoint: string,
-    options: RequestInit = {}
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
+    data?: any
   ): Promise<CosmosDbResponse<T>> {
     try {
-      const response = await fetch(`${COSMOS_API_BASE_URL}${endpoint}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
-        ...options,
-      });
+      let response;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          error: data.message || `HTTP ${response.status}: ${response.statusText}`,
-          statusCode: response.status,
-        };
+      switch (method) {
+        case 'GET':
+          response = await apiClient.get<T>(endpoint);
+          break;
+        case 'POST':
+          response = await apiClient.post<T>(endpoint, data);
+          break;
+        case 'PATCH':
+          response = await apiClient.patch<T>(endpoint, data);
+          break;
+        case 'DELETE':
+          response = await apiClient.delete<T>(endpoint);
+          break;
       }
 
       return {
         success: true,
-        data,
+        data: response.data,
         statusCode: response.status,
       };
     } catch (error) {
       console.error('Cosmos DB request failed:', error);
+      const axiosError = error as AxiosError;
+
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: typeof axiosError.response?.data === 'string'
+          ? axiosError.response.data
+          : axiosError.message || 'Unknown error occurred',
+        statusCode: axiosError.response?.status,
       };
     }
   }
@@ -75,37 +81,29 @@ class CosmosDbService {
     if (filters?.limit) queryParams.append('limit', filters.limit.toString());
     if (filters?.offset) queryParams.append('offset', filters.offset.toString());
 
-    const endpoint = `/api/accounts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return this.makeRequest<Account[]>(endpoint);
+    const endpoint = `/accounts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.makeRequest<Account[]>(endpoint, 'GET');
   }
 
   async getAccountById(id: string): Promise<CosmosDbResponse<Account>> {
-    return this.makeRequest<Account>(`/api/accounts/${id}`);
+    return this.makeRequest<Account>(`/accounts/${id}`, 'GET');
   }
 
   async createAccount(account: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>): Promise<CosmosDbResponse<Account>> {
-    return this.makeRequest<Account>('/api/accounts', {
-      method: 'POST',
-      body: JSON.stringify(account),
-    });
+    return this.makeRequest<Account>('/accounts', 'POST', account);
   }
 
   async updateAccount(id: string, updates: Partial<Account>): Promise<CosmosDbResponse<Account>> {
-    return this.makeRequest<Account>(`/api/accounts/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(updates),
-    });
+    return this.makeRequest<Account>(`/accounts/${id}`, 'PATCH', updates);
   }
 
   async deleteAccount(id: string): Promise<CosmosDbResponse<void>> {
-    return this.makeRequest<void>(`/api/accounts/${id}`, {
-      method: 'DELETE',
-    });
+    return this.makeRequest<void>(`/accounts/${id}`, 'DELETE');
   }
 
   // Search accounts by name or other criteria
   async searchAccounts(query: string): Promise<CosmosDbResponse<Account[]>> {
-    return this.makeRequest<Account[]>(`/api/accounts/search?q=${encodeURIComponent(query)}`);
+    return this.makeRequest<Account[]>(`/accounts/search?q=${encodeURIComponent(query)}`, 'GET');
   }
 }
 
