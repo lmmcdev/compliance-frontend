@@ -66,7 +66,7 @@ interface LicenseTable {
 
 interface LicenseData {
   success: boolean;
-  data: {
+  data?: {
     result?: {
       fields?: LicenseField[];
       tables?: LicenseTable[];
@@ -83,6 +83,16 @@ interface LicenseData {
   meta?: {
     traceId?: string;
   };
+  // Support for dynamic JSON structures - fields could be at different paths
+  fields?: LicenseField[];
+  result?: {
+    fields?: LicenseField[];
+    tables?: LicenseTable[];
+    content?: string;
+    pages?: number;
+  };
+  // Allow any additional properties for flexible JSON parsing
+  [key: string]: any;
 }
 
 
