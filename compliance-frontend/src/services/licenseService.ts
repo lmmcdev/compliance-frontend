@@ -45,8 +45,8 @@ export const licenseService = {
     return response.data;
   },
 
-  async uploadLicenseDocumentToStorage(file: File, metadata?: Record<string, any>): Promise<string> {
-    const result = await fileUploadService.uploadLicenseDocument(file, metadata);
-    return result.url;
+  async uploadLicenseDocumentToStorage(file: File): Promise<string> {
+    const result = await fileUploadService.uploadLicenseDocument(file);
+    return result.data.fileUrl;
   },
 };

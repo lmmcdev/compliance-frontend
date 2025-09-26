@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
 import { theme } from './theme/theme';
 import Layout from './components/Layout/Layout';
 import Login from './components/Login/Login';
@@ -41,7 +42,9 @@ const AppRoutes = () => {
           path="/licenses"
           element={
             <ProtectedRoute>
-              <LicenseTable />
+              <DataProvider>
+                <LicenseTable />
+              </DataProvider>
             </ProtectedRoute>
           }
         />

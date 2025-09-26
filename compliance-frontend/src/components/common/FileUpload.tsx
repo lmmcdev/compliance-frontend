@@ -150,10 +150,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     setLicenseData(null);
 
     try {
-      const result = await fileUploadService.uploadLicenseDocument(file, {
-        author: 'user',
-        purpose: 'license_upload',
-      });
+      const result = await fileUploadService.uploadLicenseDocument(file);
 
       if (result.webhookResponse) {
         setLicenseData(result.webhookResponse);
