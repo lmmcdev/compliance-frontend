@@ -3,6 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
+import AuthenticationProvider from './middleware/AuthenticationProvider';
 import { theme } from './theme/theme';
 import Layout from './components/Layout/Layout';
 import Login from './components/Login/Login';
@@ -80,9 +81,11 @@ function App() {
       <CssBaseline />
       <Box sx={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
         <AuthProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
+          <AuthenticationProvider>
+            <Router>
+              <AppRoutes />
+            </Router>
+          </AuthenticationProvider>
         </AuthProvider>
       </Box>
     </ThemeProvider>
