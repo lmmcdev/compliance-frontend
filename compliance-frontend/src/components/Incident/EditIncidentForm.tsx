@@ -16,10 +16,10 @@ import {
   Close as CloseIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
-import { FormBuilder, type FormFieldConfig } from './FormBuilder';
-import { useIncidents, useIncidentOperations, type Incident, type UpdateIncidentData } from '../../../contexts/IncidentsContext';
+import { FormBuilder, type FormFieldConfig } from '../common/Forms/FormBuilder';
+import { useIncidents, useIncidentOperations, type Incident, type UpdateIncidentData } from '../../contexts/IncidentsContext';
 import { styled } from '@mui/material/styles';
-import { getIncidentWorkingHoursSummary, formatHours, formatCurrency } from '../../../utils/workingHoursCalculator';
+import { getIncidentWorkingHoursSummary, formatHours, formatCurrency } from '../../utils/workingHoursCalculator';
 
 const DialogHeader = styled(Box)(({ theme }) => ({
   display: 'flex',

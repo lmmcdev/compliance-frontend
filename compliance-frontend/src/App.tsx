@@ -5,11 +5,10 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthenticationProvider from './middleware/AuthenticationProvider';
 import { theme } from './theme/theme';
 import Layout from './components/Layout/Layout';
-import Login from './components/Login/Login';
+import { Login, AuthError } from './components/Auth';
 import Dashboard from './components/Dashboard/Dashboard';
 import { LicensesPage } from './components/LicenseManagement/LicensesPage';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
-import AuthError from './components/AuthError/AuthError';
 import { IncidentsPage } from './components/Incident/IncidentsPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

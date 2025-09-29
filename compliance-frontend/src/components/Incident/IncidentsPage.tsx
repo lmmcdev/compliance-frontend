@@ -15,7 +15,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { IncidentsProvider, useIncidents, type Incident } from '../../contexts/IncidentsContext';
 import { IncidentsTable } from '../common/DataTable/IncidentsTable';
-import { EditIncident } from '../common/Forms/EditIncident';
+import { EditIncident } from './EditIncidentForm';
 import { IncidentViewDialog } from '../common/Dialogs/IncidentViewDialog';
 import { useSelection } from '../../hooks/patterns';
 
