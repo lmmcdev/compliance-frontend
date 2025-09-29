@@ -21,8 +21,8 @@ import {
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import { useAccounts, useAccountSearch } from '../../contexts/AccountContext';
-import type { Account } from '../../services/accountsService';
+import { useAccounts, useAccountSearch } from '../../../../contexts/AccountContext';
+import type { Account } from '../../../../services/accountsService';
 
 interface AccountSelectionProps {
   selectedAccount?: Account | null;

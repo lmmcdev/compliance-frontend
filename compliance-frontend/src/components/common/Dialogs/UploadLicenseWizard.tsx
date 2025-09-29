@@ -26,8 +26,8 @@ import {
   Save as SaveIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import AccountSelection from '../AccountSelection';
-import FileUpload from '../FileUpload';
+import { AccountSelection } from '../Inputs/AccountSelection';
+import { FileUpload } from '../Inputs/FileUpload';
 import { ExtractedFieldsForm } from '../Forms/ExtractedFieldsForm';
 import type { ExtractedField, DocumentMetadata } from '../Forms/ExtractedFieldsForm';
 import { fileUploadService } from '../../../services/fileUploadService';

@@ -13,8 +13,8 @@ import {
   Description as DocumentIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
-import { fileUploadService } from '../../services/fileUploadService';
-import LicenseDataDisplay from './LicenseDataDisplay';
+import { fileUploadService } from '../../../../services/fileUploadService';
+import LicenseDataDisplay from '../../Display/LicenseDataDisplay';
 
 export interface FileUploadProps {
   file: File | null;

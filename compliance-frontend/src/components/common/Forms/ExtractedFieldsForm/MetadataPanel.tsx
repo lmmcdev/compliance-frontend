@@ -48,7 +48,7 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
     >
       <Grid container spacing={2} alignItems="center">
         {/* Document Type */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FileIcon color="primary" />
             <Box>
@@ -63,7 +63,7 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
         </Grid>
 
         {/* Fields Extracted Count */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <InfoIcon color="primary" />
             <Box>
@@ -79,7 +79,7 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
 
         {/* Overall Confidence Score */}
         {metadata.confidence !== undefined && (
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <VerifiedIcon color="success" />
               <Box sx={{ flex: 1 }}>

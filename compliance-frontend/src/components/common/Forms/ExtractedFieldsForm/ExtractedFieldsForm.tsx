@@ -79,7 +79,7 @@ export const ExtractedFieldsForm: React.FC<ExtractedFieldsFormProps> = ({
       <Box component="form" noValidate>
         <Grid container spacing={3}>
           {fields.map((field) => (
-            <Grid item xs={12} md={6} key={field.name}>
+            <Grid key={field.name} size={{ xs: 12, md: 6 }}>
               <FieldCard
                 field={field}
                 value={initialValues[field.name]}
