@@ -15,11 +15,6 @@ import {
   CircularProgress,
   Alert,
   Divider,
-  Chip,
-  Grid,
-  TextField,
-  Tooltip,
-  LinearProgress,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -29,13 +24,12 @@ import {
   Description as FileIcon,
   Edit as FormIcon,
   Save as SaveIcon,
-  VerifiedUser as VerifiedIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import AccountSelection from '../AccountSelection';
 import FileUpload from '../FileUpload';
+import { ExtractedFieldsForm } from '../Forms/ExtractedFieldsForm';
+import type { ExtractedField, DocumentMetadata } from '../Forms/ExtractedFieldsForm';
 import { fileUploadService } from '../../../services/fileUploadService';
 import { licenseService } from '../../../services/licenseService';
 import type { Account } from '../../../services/accountsService';
@@ -89,13 +83,6 @@ interface WizardState {
   finalLicenseData: any;
 }
 
-interface ExtractedField {
-  name: string;
-  value: string | number;
-  confidence: number;
-  type: 'string' | 'number' | 'date' | 'email' | 'phone' | 'address';
-}
-
 interface TempUploadResponse {
   success: boolean;
   data: {
@@ -103,11 +90,7 @@ interface TempUploadResponse {
       fields: ExtractedField[];
     };
     licenseType?: string;
-    metadata?: {
-      documentType?: string;
-      processingTime?: number;
-      confidence?: number;
-    };
+    metadata?: DocumentMetadata;
   };
 }
 
@@ -139,24 +122,14 @@ export const UploadLicenseWizard: React.FC<UploadLicenseWizardProps> = ({
     return wizardState.tempUploadResponse?.data?.result?.fields || [];
   }, [wizardState.tempUploadResponse]);
 
-  // Get confidence level info
-  const getConfidenceInfo = (confidence: number) => {
-    if (confidence >= 0.9) {
-      return { label: 'High Confidence', color: 'success' as const, icon: VerifiedIcon };
-    } else if (confidence >= 0.7) {
-      return { label: 'Medium Confidence', color: 'warning' as const, icon: WarningIcon };
-    } else {
-      return { label: 'Low Confidence', color: 'error' as const, icon: WarningIcon };
-    }
-  };
-
-  // Format field label for display
-  const formatFieldLabel = (name: string): string => {
-    return name
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
-  };
+  // Extract metadata for the form
+  const documentMetadata: DocumentMetadata | undefined = useMemo(() => {
+    if (!wizardState.tempUploadResponse?.data) return undefined;
+    return {
+      licenseType: wizardState.tempUploadResponse.data.licenseType,
+      ...wizardState.tempUploadResponse.data.metadata,
+    };
+  }, [wizardState.tempUploadResponse]);
 
   const resetWizard = useCallback(() => {
     setActiveStep(0);
@@ -377,208 +350,14 @@ export const UploadLicenseWizard: React.FC<UploadLicenseWizardProps> = ({
       case 2:
         return (
           <StepContainer>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-              Review & Edit Extracted Information
-            </Typography>
-
-            {/* Metadata Section */}
-            {wizardState.tempUploadResponse?.data && (
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  mb: 3,
-                  bgcolor: 'primary.50',
-                  border: '1px solid',
-                  borderColor: 'primary.200',
-                  borderRadius: 2,
-                }}
-              >
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <FileIcon color="primary" />
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Document Type
-                        </Typography>
-                        <Typography variant="body2" fontWeight={600}>
-                          {wizardState.tempUploadResponse.data.licenseType ||
-                           wizardState.tempUploadResponse.data.metadata?.documentType ||
-                           'General License'}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <InfoIcon color="primary" />
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Fields Extracted
-                        </Typography>
-                        <Typography variant="body2" fontWeight={600}>
-                          {extractedFields.length} fields
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  {wizardState.tempUploadResponse.data.metadata?.confidence !== undefined && (
-                    <Grid item xs={12} md={4}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <VerifiedIcon color="success" />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="caption" color="text.secondary" display="block">
-                            Overall Confidence
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={wizardState.tempUploadResponse.data.metadata.confidence * 100}
-                              sx={{ flex: 1, height: 6, borderRadius: 3 }}
-                              color={
-                                wizardState.tempUploadResponse.data.metadata.confidence >= 0.9
-                                  ? 'success'
-                                  : wizardState.tempUploadResponse.data.metadata.confidence >= 0.7
-                                  ? 'warning'
-                                  : 'error'
-                              }
-                            />
-                            <Typography variant="body2" fontWeight={600}>
-                              {Math.round(wizardState.tempUploadResponse.data.metadata.confidence * 100)}%
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  )}
-                </Grid>
-              </Paper>
-            )}
-
-            {/* Instructions Alert */}
-            <Alert severity="info" sx={{ mb: 3 }}>
-              Review the automatically extracted information below. You can edit any field if needed.
-              Fields with high confidence (green) are likely accurate, while those with lower confidence (yellow/red) should be verified.
-            </Alert>
-
-            {/* Dynamic Form Fields */}
-            {extractedFields.length > 0 ? (
-              <Box component="form" noValidate>
-                <Grid container spacing={3}>
-                  {extractedFields.map((field, index) => {
-                    const confidenceInfo = getConfidenceInfo(field.confidence);
-                    const ConfidenceIcon = confidenceInfo.icon;
-                    const fieldLabel = formatFieldLabel(field.name);
-
-                    return (
-                      <Grid item xs={12} md={6} key={field.name}>
-                        <Paper
-                          elevation={1}
-                          sx={{
-                            p: 2.5,
-                            borderRadius: 2,
-                            transition: 'all 0.2s',
-                            border: '2px solid',
-                            borderColor: 'transparent',
-                            '&:hover': {
-                              borderColor: 'primary.light',
-                              boxShadow: 3,
-                            },
-                          }}
-                        >
-                          {/* Field Header with Confidence */}
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                            <Typography variant="subtitle2" fontWeight={600} color="text.primary">
-                              {fieldLabel}
-                            </Typography>
-                            <Tooltip title={`${confidenceInfo.label} (${Math.round(field.confidence * 100)}%)`}>
-                              <Chip
-                                icon={<ConfidenceIcon />}
-                                label={`${Math.round(field.confidence * 100)}%`}
-                                size="small"
-                                color={confidenceInfo.color}
-                                variant="outlined"
-                              />
-                            </Tooltip>
-                          </Box>
-
-                          {/* Confidence Bar */}
-                          <LinearProgress
-                            variant="determinate"
-                            value={field.confidence * 100}
-                            sx={{
-                              mb: 2,
-                              height: 4,
-                              borderRadius: 2,
-                              bgcolor: 'grey.200',
-                            }}
-                            color={confidenceInfo.color}
-                          />
-
-                          {/* Input Field */}
-                          <TextField
-                            fullWidth
-                            name={field.name}
-                            type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
-                            value={wizardState.formData[field.name] ?? field.value ?? ''}
-                            onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                            placeholder={`Enter ${fieldLabel.toLowerCase()}`}
-                            variant="outlined"
-                            size="small"
-                            InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                bgcolor: 'background.paper',
-                              },
-                            }}
-                          />
-
-                          {/* Extracted Value Info */}
-                          {field.value && (
-                            <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                Extracted:
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  fontFamily: 'monospace',
-                                  bgcolor: 'grey.100',
-                                  px: 0.75,
-                                  py: 0.25,
-                                  borderRadius: 0.5,
-                                }}
-                              >
-                                {String(field.value)}
-                              </Typography>
-                            </Box>
-                          )}
-                        </Paper>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-
-                {/* Continue Button */}
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleContinueToSave}
-                    disabled={loading}
-                    startIcon={<CheckIcon />}
-                    sx={{ minWidth: 200 }}
-                  >
-                    Continue to Save
-                  </Button>
-                </Box>
-              </Box>
-            ) : (
-              <Alert severity="warning">
-                No fields were extracted from the uploaded document. Please try uploading a different file or contact support.
-              </Alert>
-            )}
+            <ExtractedFieldsForm
+              fields={extractedFields}
+              metadata={documentMetadata}
+              initialValues={wizardState.formData}
+              onFieldChange={handleFieldChange}
+              onSubmit={handleContinueToSave}
+              loading={loading}
+            />
           </StepContainer>
         );
 
