@@ -1,6 +1,31 @@
 import React, { createContext, useContext, useCallback } from 'react';
 import { useApiQuery, useApiMutation } from '../hooks/data';
 
+export interface IncidentComment {
+  Date: string;
+  Comment: string;
+  EndUserID?: number | null;
+  TechnicianContactID?: number | null;
+  Email?: string;
+  FirstName?: string;
+  LastName?: string;
+  IsInternal: boolean;
+}
+
+export interface WorkingHours {
+  TicketID: number;
+  WorkHoursID: number;
+  StartWorkHour: string;
+  EndWorkHour: string;
+  TechnicianContactID: number;
+  Billiable: boolean;
+  OnCustomerSite: boolean;
+  TechnicianFullName: string;
+  TechnicianEmail: string;
+  RateID: number;
+  RateAmount: number;
+}
+
 export interface Incident {
   id: string;
   doc_type: string;
@@ -41,6 +66,9 @@ export interface Incident {
   _etag: string;
   _attachments: string;
   _ts: number;
+  // New fields
+  comments?: IncidentComment[];
+  Working_Hours?: WorkingHours[];
 }
 
 export interface CreateIncidentData {

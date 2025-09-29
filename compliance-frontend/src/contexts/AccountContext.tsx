@@ -61,7 +61,7 @@ interface AccountProviderProps {
 
 export const AccountProvider: React.FC<AccountProviderProps> = ({ children }) => {
   // Main accounts query
-  const accountsQuery = useApiQuery<{ accounts: Account[] }>(
+  const accountsQuery = useApiQuery<{ success: boolean; data: { items: Account[] } }>(
     'accounts',
     '/accounts',
     {
@@ -72,7 +72,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({ children }) =>
   );
 
   // Search functionality
-  const accountsSearch = useSearch<{ accounts: Account[] }>(
+  const accountsSearch = useSearch<{ success: boolean; data: { items: Account[] } }>(
     '/accounts',
     'search',
     {
@@ -177,7 +177,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({ children }) =>
 
   const contextValue: AccountContextValue = {
     accounts: {
-      data: accountsQuery.data?.accounts || null,
+      data: accountsQuery.data?.success ? accountsQuery.data.data.items : null,
       loading: accountsQuery.loading,
       error: accountsQuery.error,
       refetch: accountsQuery.refetch,
@@ -186,7 +186,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({ children }) =>
 
     search: {
       query: accountsSearch.query,
-      data: accountsSearch.data?.accounts || null,
+      data: accountsSearch.data?.success ? accountsSearch.data.data.items : null,
       loading: accountsSearch.loading,
       error: accountsSearch.error,
       isSearching: accountsSearch.isSearching,

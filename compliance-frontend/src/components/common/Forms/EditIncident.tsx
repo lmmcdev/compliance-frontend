@@ -19,6 +19,7 @@ import {
 import { FormBuilder, type FormFieldConfig } from './FormBuilder';
 import { useIncidents, useIncidentOperations, type Incident, type UpdateIncidentData } from '../../../contexts/IncidentsContext';
 import { styled } from '@mui/material/styles';
+import { getIncidentWorkingHoursSummary, formatHours, formatCurrency } from '../../../utils/workingHoursCalculator';
 
 const DialogHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -412,6 +413,31 @@ export const EditIncident: React.FC<EditIncidentProps> = ({
                       {incident.Site_name || 'Unknown'}
                     </Typography>
                   </InfoRow>
+
+                  {/* Working Hours Summary */}
+                  {(() => {
+                    const workingHoursSummary = getIncidentWorkingHoursSummary(incident);
+                    if (workingHoursSummary.totalHours > 0) {
+                      return (
+                        <InfoRow>
+                          <Typography variant="subtitle2" color="text.secondary">
+                            Working Hours
+                          </Typography>
+                          <Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              Total: {formatHours(workingHoursSummary.totalHours)} • Cost: {formatCurrency(workingHoursSummary.totalCost)}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Billable: {formatHours(workingHoursSummary.billiableHours)} •
+                              Non-Billable: {formatHours(workingHoursSummary.nonBilliableHours)} •
+                              {workingHoursSummary.agentBreakdown.length} Agent(s)
+                            </Typography>
+                          </Box>
+                        </InfoRow>
+                      );
+                    }
+                    return null;
+                  })()}
 
                   {incident.Work_hour_start_Time && (
                     <InfoRow>

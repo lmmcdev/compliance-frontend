@@ -2,16 +2,15 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DataProvider } from './contexts/DataContext';
 import AuthenticationProvider from './middleware/AuthenticationProvider';
 import { theme } from './theme/theme';
 import Layout from './components/Layout/Layout';
 import Login from './components/Login/Login';
 import Dashboard from './components/Dashboard/Dashboard';
-import LicenseTable from './components/LicenseTable/LicenseTable';
+import { LicensesPage } from './components/LicenseManagement/LicensesPage';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
 import AuthError from './components/AuthError/AuthError';
-import { IncidentsPage } from './components/pages/IncidentsPage';
+import { IncidentsPage } from './components/Incident/IncidentsPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -44,9 +43,7 @@ const AppRoutes = () => {
           path="/licenses"
           element={
             <ProtectedRoute>
-              <DataProvider>
-                <LicenseTable />
-              </DataProvider>
+              <LicensesPage />
             </ProtectedRoute>
           }
         />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -21,7 +21,7 @@ import {
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import { useAccounts } from '../../contexts/DataContext';
+import { useAccounts, useAccountSearch } from '../../contexts/AccountContext';
 import type { Account } from '../../services/accountsService';
 
 interface AccountSelectionProps {
@@ -80,28 +80,18 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
   onAccountSelect,
   disabled = false,
 }) => {
-  const { accounts, loading, error, fetchAccounts, searchAccounts, refreshAccounts, clearError } = useAccounts();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const { accounts, loading, error, refresh } = useAccounts();
+  const {
+    query: searchQuery,
+    data: searchResults,
+    loading: searchLoading,
+    setQuery: setSearchQuery,
+    clearSearch
+  } = useAccountSearch();
 
-  // Debounced search
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      fetchAccounts();
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        await searchAccounts(searchQuery.trim());
-      } finally {
-        setIsSearching(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  // Get the current accounts list (search results if searching, otherwise all accounts)
+  const currentAccounts = searchQuery.trim() ? (searchResults || []) : (accounts || []);
+  const isSearching = searchLoading;
 
   const handleAccountClick = (account: Account) => {
     if (disabled) return;
@@ -109,8 +99,14 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
   };
 
   const handleRefresh = async () => {
-    clearError();
-    await refreshAccounts();
+    if (searchQuery.trim()) {
+      clearSearch();
+    }
+    await refresh();
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
   };
 
   const getAccountIcon = (type: string) => {
@@ -125,7 +121,7 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
     }
   };
 
-  if (loading && accounts.length === 0) {
+  if (loading && currentAccounts.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
         <CircularProgress />
@@ -161,7 +157,7 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
           fullWidth
           placeholder="Search accounts by name, email, or type..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           disabled={disabled}
           InputProps={{
             startAdornment: (
@@ -189,14 +185,14 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
       </SearchContainer>
 
       <AccountsContainer>
-        {accounts.length === 0 ? (
+        {currentAccounts.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="body2" color="text.secondary">
               {searchQuery ? 'No accounts found matching your search.' : 'No accounts available.'}
             </Typography>
           </Box>
         ) : (
-          accounts.map((account) => {
+          currentAccounts.map((account) => {
             const isSelected = selectedAccount?.id === account.id;
 
             return (

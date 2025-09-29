@@ -16,6 +16,7 @@ import { styled } from '@mui/material/styles';
 import { IncidentsProvider, useIncidents, type Incident } from '../../contexts/IncidentsContext';
 import { IncidentsTable } from '../common/DataTable/IncidentsTable';
 import { EditIncident } from '../common/Forms/EditIncident';
+import { IncidentViewDialog } from '../common/Dialogs/IncidentViewDialog';
 import { useSelection } from '../../hooks/patterns';
 
 const PageContainer = styled(Box)(({ theme }) => ({
@@ -92,7 +93,9 @@ const IncidentsPageContent: React.FC<IncidentsPageContentProps> = () => {
   } = useIncidents();
 
   const [editIncidentOpen, setEditIncidentOpen] = useState(false);
+  const [viewIncidentOpen, setViewIncidentOpen] = useState(false);
   const [selectedIncidentForEdit, setSelectedIncidentForEdit] = useState<Incident | null>(null);
+  const [selectedIncidentForView, setSelectedIncidentForView] = useState<Incident | null>(null);
 
   // Selection management
   const {
@@ -120,8 +123,8 @@ const IncidentsPageContent: React.FC<IncidentsPageContentProps> = () => {
   };
 
   const handleViewIncident = (incident: Incident) => {
-    setSelectedIncidentForEdit(incident);
-    setEditIncidentOpen(true);
+    setSelectedIncidentForView(incident);
+    setViewIncidentOpen(true);
   };
 
   const handleDeleteIncident = (incident: Incident) => {
@@ -142,6 +145,19 @@ const IncidentsPageContent: React.FC<IncidentsPageContentProps> = () => {
   const handleCloseEditDialog = () => {
     setEditIncidentOpen(false);
     setSelectedIncidentForEdit(null);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewIncidentOpen(false);
+    setSelectedIncidentForView(null);
+  };
+
+  const handleEditFromView = (incident: Incident) => {
+    // Close view dialog and open edit dialog
+    setViewIncidentOpen(false);
+    setSelectedIncidentForView(null);
+    setSelectedIncidentForEdit(incident);
+    setEditIncidentOpen(true);
   };
 
   if (error) {
@@ -282,12 +298,22 @@ const IncidentsPageContent: React.FC<IncidentsPageContentProps> = () => {
         </Tooltip>
       </FloatingActions>
 
-      {/* Edit/View Incident Dialog */}
+      {/* View Incident Dialog */}
+      {selectedIncidentForView && (
+        <IncidentViewDialog
+          open={viewIncidentOpen}
+          onClose={handleCloseViewDialog}
+          incident={selectedIncidentForView}
+          onEdit={handleEditFromView}
+        />
+      )}
+
+      {/* Edit Incident Dialog */}
       <EditIncident
         open={editIncidentOpen}
         onClose={handleCloseEditDialog}
         incident={selectedIncidentForEdit || undefined}
-        mode="view"
+        mode="edit"
       />
     </PageContainer>
   );

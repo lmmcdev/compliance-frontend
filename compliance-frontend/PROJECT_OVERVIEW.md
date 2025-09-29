@@ -80,6 +80,13 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 - Error standardization
 - Retry logic
 
+**`licenseService.ts`** - Consolidated license operations (Single API source)
+- All license CRUD operations using `/license-types` endpoints
+- Handles nested API response format: `{ success: true, data: [...] }`
+- Automatic data extraction from wrapped responses
+- Type-safe operations with proper error handling
+- Eliminates API call duplication between service and context layers
+
 **`fileUploadService.ts`** - File upload functionality
 - Multi-file support
 - Progress tracking
@@ -87,13 +94,13 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 
 ## Component Systems
 
-### Table System (`src/components/common/DataTable/`)
+### Consolidated Table System (`src/components/common/DataTable/`)
 
-**`DataTable<T>`** - Advanced data table component
+**`DataTable<T>`** - Universal generic table component
 ```typescript
-<DataTable<License>
-  title="Licenses"
-  data={licenses}
+<DataTable<T>
+  title="Data Table"
+  data={items}
   columns={columns}
   loading={loading}
   pagination={pagination}
@@ -103,19 +110,36 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 />
 ```
 
-Features:
-- Generic TypeScript support
-- Sorting, filtering, pagination
-- Row selection (single/multi)
-- Custom row actions
-- Responsive design
-- Loading and error states
+**Specialized Table Implementations:**
 
-**`LicensesTable`** - Specialized license table
-- Pre-configured columns for license data
+**`LicensesTable`** - License management table
+- Pre-configured columns for license data (status, document type, upload date)
 - Built-in actions (view, edit, delete, process, download)
-- License status handling
-- Integration with license operations
+- License status handling with color coding
+- Integration with `useLicenses()` and `useLicenseOperations()`
+- Working hours calculation display
+
+**`IncidentsTable`** - Incident management table
+- Pre-configured columns for incident data (title, status, priority, agent)
+- Built-in actions (view, edit, delete, assign)
+- Status and priority color coding
+- Integration with `useIncidents()` and `useIncidentOperations()`
+- Working hours and cost calculations
+
+**`AccountsTable`** - Account management table
+- Pre-configured columns for account data
+- Built-in CRUD operations
+- Integration with `useAccounts()` and `useAccountOperations()`
+
+**Universal Features:**
+- Generic TypeScript support with type safety
+- Sorting, filtering, and advanced pagination
+- Multi-row selection with bulk operations
+- Custom row actions and context menus
+- Responsive design with mobile optimization
+- Loading states and error handling
+- Export capabilities
+- Real-time data updates
 
 ### Form System (`src/components/common/Forms/`)
 
@@ -159,6 +183,78 @@ Field types supported:
 - Trend indicators
 - Status colors
 - Loading states
+
+### Dialog System (`src/components/common/Dialogs/`)
+
+**`IncidentViewDialog`** - Professional incident viewing dialog
+```typescript
+<IncidentViewDialog
+  open={viewDialogOpen}
+  onClose={handleCloseView}
+  incident={selectedIncident}
+  onEdit={handleEditFromView}
+/>
+```
+
+Features:
+- **Tabbed interface** with Overview, Comments, Working Hours, Technical Details
+- **Comments section** with user avatars, timestamps, internal/external labels
+- **Working hours breakdown** with agent-specific totals and session details
+- **Professional styling** with Material-UI v7 components
+- **Responsive design** that works on all screen sizes
+- **Seamless integration** with edit workflows
+
+**`UploadLicenseWizard`** - Comprehensive 4-step license upload wizard
+```typescript
+<UploadLicenseWizard
+  open={uploadWizardOpen}
+  onClose={() => setUploadWizardOpen(false)}
+  onSuccess={handleUploadSuccess}
+/>
+```
+
+**4-Step Workflow**:
+1. **Account Selection** - Choose account using integrated AccountSelection component
+2. **File Upload** - Upload license documents via /files/temp-upload endpoint with drag-and-drop support
+3. **Dynamic Form** - Auto-generated form based on temp-upload response for different license types
+4. **License Creation** - Final processing and creation with visual confirmation
+
+**Key Features**:
+- **Wide dialog design** (1000px max-width, 95vw, 90vh) for optimal viewing
+- **Visual stepper navigation** with Material-UI icons and progress indicators
+- **Dynamic form generation** based on license type detection from uploaded documents
+- **Reuses existing components** (AccountSelection, FileUpload, FormBuilder)
+- **Professional error handling** with user-friendly messages and retry options
+- **Loading states** throughout the entire workflow
+- **Success confirmation** with license summary and auto-close functionality
+- **Modern UI styling** with gradients, shadows, and responsive design
+- **Centralized service integration** using licenseService and fileUploadService
+
+**Integration**:
+- Seamlessly integrated into LicensesPage with dedicated "Upload License" button
+- Automatic license list refresh upon successful upload
+- Compatible with existing license management workflow
+
+### Working Hours System (`src/utils/workingHoursCalculator.ts`)
+
+**Professional working hours calculation and display system:**
+
+```typescript
+const summary = getIncidentWorkingHoursSummary(incident);
+// Returns: { totalHours, totalCost, billiableHours, agentBreakdown }
+
+const formattedHours = formatHours(2.5); // "2h 30m"
+const formattedCost = formatCurrency(250.50); // "$250.50"
+```
+
+**Key Features:**
+- **Total hours calculation** across all agents and sessions
+- **Cost calculation** based on hourly rates and duration
+- **Billable vs non-billable** hours breakdown
+- **Agent-specific summaries** with individual totals
+- **Session-level details** including rates, duration, billing status
+- **Professional formatting** for time and currency display
+- **Integration with tables** showing quick totals in incident lists
 
 ## Advanced Patterns
 
@@ -275,9 +371,16 @@ compliance-frontend/
 ├── src/
 │   ├── components/
 │   │   ├── common/
-│   │   │   ├── DataTable/          # Table system
-│   │   │   │   ├── DataTable.tsx
-│   │   │   │   ├── LicensesTable.tsx
+│   │   │   ├── DataTable/          # Universal table system
+│   │   │   │   ├── DataTable.tsx       # Generic table component
+│   │   │   │   ├── LicensesTable.tsx   # Licenses implementation
+│   │   │   │   ├── IncidentsTable.tsx  # Incidents implementation
+│   │   │   │   ├── AccountsTable.tsx   # Accounts implementation
+│   │   │   │   └── index.ts
+│   │   │   ├── Dialogs/            # Professional dialog components
+│   │   │   │   ├── IncidentViewDialog.tsx
+│   │   │   │   ├── UploadLicenseWizard.tsx
+│   │   │   │   ├── AddLicenseDialog.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── Dashboard/          # Dashboard system
 │   │   │   │   ├── Dashboard.tsx
@@ -290,11 +393,17 @@ compliance-frontend/
 │   │   │   └── Layout/             # Layout system
 │   │   │       ├── ResponsiveContainer.tsx
 │   │   │       └── index.ts
-│   │   └── pages/                  # Page components
+│   │   ├── Incident/               # Incident management
+│   │   │   └── IncidentsPage.tsx
+│   │   └── License/                # License management
+│   │       └── LicensesPage.tsx
 │   ├── contexts/                   # Domain contexts
-│   │   ├── LicensesContext.tsx
-│   │   ├── AccountsContext.tsx
-│   │   ├── FileUploadContext.tsx
+│   │   ├── LicenseContext.tsx      # License management state
+│   │   ├── AccountContext.tsx      # Account management state
+│   │   ├── IncidentsContext.tsx    # Incidents management state
+│   │   ├── ComplianceContext.tsx   # Compliance management state
+│   │   ├── AuthContext.tsx         # Authentication state
+│   │   ├── DataContext.tsx         # Legacy data context
 │   │   └── index.ts
 │   ├── hooks/
 │   │   ├── api/                    # API hooks
@@ -319,6 +428,11 @@ compliance-frontend/
 │   ├── services/                   # Service layer
 │   │   ├── apiClient.ts
 │   │   ├── fileUploadService.ts
+│   │   ├── accountsService.ts
+│   │   ├── licenseService.ts
+│   │   └── index.ts
+│   ├── utils/                      # Utility functions
+│   │   ├── workingHoursCalculator.ts
 │   │   └── index.ts
 │   └── types/                      # TypeScript definitions
 ├── package.json
@@ -500,6 +614,58 @@ function LargeList({ items }: { items: any[] }) {
 - **API Integration**: Azure Functions
 - **Styling**: Material-UI styled components
 - **Development**: ESLint, Prettier, TypeScript strict mode
+
+## Recent Improvements (Latest Changes)
+
+### API Consolidation and Error Fixes
+
+**Problem Solved**: Eliminated duplicate API calls and fixed runtime errors
+- **Fixed**: `Uncaught TypeError: items.filter is not a function` in useSelection hook
+- **Root Cause**: API returned nested format `{ success: true, data: [...] }` but code expected flat array
+- **Solution**: Updated `licenseService.ts` to handle both nested and flat response formats
+
+**API Consolidation**:
+- ✅ **Single source of truth**: All license API calls now go through `licenseService.ts`
+- ✅ **Consistent endpoints**: All operations use `/license-types` path
+- ✅ **Eliminated duplication**: Removed ~50 lines of duplicate API logic from LicenseContext
+- ✅ **Improved maintainability**: Future API changes only need updates in one location
+
+**Technical Changes**:
+```typescript
+// Before: Mixed API patterns in LicenseContext
+const response = await fetch(`${baseUrl}/licenses/${id}`, { method: 'PUT' });
+
+// After: Consolidated service approach
+const result = await licenseService.updateLicense(id, data);
+```
+
+**Response Format Handling**:
+```typescript
+// Handles both response formats automatically
+if (response.data?.success && Array.isArray(response.data.data)) {
+  return response.data.data; // Nested format
+}
+return Array.isArray(response.data) ? response.data : []; // Flat format
+```
+
+**Component Cleanup**:
+- ✅ **Removed unused components**: License wizard system, examples, unused dialogs
+- ✅ **Build optimization**: Reduced bundle size and improved build time
+- ✅ **Type safety**: Unified License interface across the application
+
+### API Endpoints Documentation
+
+**License Management** (`/api/license-types/`):
+- `GET /api/license-types` - Get all licenses
+- `GET /api/license-types/{id}` - Get license by ID
+- `POST /api/license-types` - Create license
+- `PUT /api/license-types/{id}` - Update license
+- `DELETE /api/license-types/{id}` - Delete license
+- `POST /api/license-types/{id}/process` - Process license
+- `POST /api/license-types/upload` - Upload document
+- `POST /api/license-types/extract` - Extract data
+
+All endpoints handle the nested response format automatically.
 
 ## Getting Started
 
