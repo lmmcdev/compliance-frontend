@@ -21,6 +21,7 @@ import {
   Search as SearchIcon,
   MoreVert as MoreIcon,
   Phone as PhoneIcon,
+  BugReport as IncidentIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -34,6 +35,7 @@ const menuItems = [
   { text: 'Call Logs', path: '/dashboard', icon: <PhoneIcon /> },
   { text: 'Charts', path: '/charts', icon: <ChartIcon /> },
   { text: 'People', path: '/people', icon: <PeopleIcon /> },
+  { text: 'Incidents', path: '/incidents', icon: <IncidentIcon /> },
   { text: 'Settings', path: '/settings', icon: <SettingsIcon /> },
   { text: 'Licenses', path: '/licenses', icon: <LicenseIcon /> },
 ];

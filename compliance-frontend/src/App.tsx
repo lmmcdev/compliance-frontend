@@ -10,6 +10,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import LicenseTable from './components/LicenseTable/LicenseTable';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
 import AuthError from './components/AuthError/AuthError';
+import { IncidentsPage } from './components/pages/IncidentsPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -53,6 +54,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <ComplianceForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/incidents"
+          element={
+            <ProtectedRoute>
+              <IncidentsPage />
             </ProtectedRoute>
           }
         />

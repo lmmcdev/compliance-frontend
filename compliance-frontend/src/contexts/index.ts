@@ -24,6 +24,12 @@ export {
   useComplianceOperations,
 } from './ComplianceContext';
 
+export {
+  IncidentsProvider,
+  useIncidents,
+  useIncidentOperations,
+} from './IncidentsContext';
+
 // Legacy context (will be gradually replaced)
 export {
   DataProvider,
