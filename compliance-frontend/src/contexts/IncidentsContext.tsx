@@ -4,6 +4,7 @@ import { useApiQuery, useApiMutation } from '../hooks/data';
 export interface IncidentComment {
   Date: string;
   Comment: string;
+  CommentHtml: string;
   EndUserID?: number | null;
   TechnicianContactID?: number | null;
   Email?: string;

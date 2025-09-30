@@ -344,7 +344,12 @@ export const IncidentViewDialog: React.FC<IncidentViewDialogProps> = ({
                             </Typography>
                           )}
                           <Typography variant="body2" sx={{ mt: 1 }}>
-                            {comment.Comment}
+                            {/* Render sanitized HTML or fallback to plain text */}
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: comment.CommentHtml || '',
+                              }}
+                            />
                           </Typography>
                         </Box>
                       }
