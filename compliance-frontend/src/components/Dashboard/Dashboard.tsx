@@ -1,7 +1,6 @@
 import  { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Box, Typography, Container, Paper } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { PieChart as PieChartIcon, BarChart as BarChartIcon, Timeline as TimelineIcon } from '@mui/icons-material';
 import StatusCard from '../common/Dashboard/StatusCard';
 import type { License } from '../../types';

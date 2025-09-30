@@ -7,7 +7,22 @@ export interface ExtractedField {
   name: string;
   value: string | number;
   confidence: number;
-  type: 'string' | 'number' | 'date' | 'email' | 'phone' | 'address';
+  type?: 'string' | 'number' | 'date' | 'email' | 'phone' | 'address' | 'text';
+  // Additional optional metadata fields
+  boundingBox?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  page?: number;
+  rawText?: string;
+  source?: string;
+  validationRules?: string[];
+  required?: boolean;
+  description?: string;
+  category?: string;
+  [key: string]: any; // Allow any additional properties from extraction
 }
 
 export interface DocumentMetadata {
