@@ -1,21 +1,14 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useApiQuery, useApiMutation, usePagination } from '../hooks/data';
+import { useApiQuery, usePagination } from '../hooks/data';
 import { useLicenseUpload } from '../hooks/useLicenseUpload';
 import { useLicenseFields } from '../hooks/useLicenseFields';
+import { licenseService } from '../services/licenseService';
+import type { License } from '../types';
 import type { LicenseData } from '../types/license';
 
-interface License {
-  id: string;
-  accountId: string;
-  documentType: string;
-  status: 'pending' | 'processed' | 'failed';
-  data: LicenseData | null;
-  uploadedAt: string;
-  processedAt?: string;
-  createdBy: string;
-  updatedAt: string;
-}
+// Re-export License type for external use
+export type { License };
 
 interface LicenseContextValue {
   // Current license being processed
@@ -38,7 +31,7 @@ interface LicenseContextValue {
   // License operations
   operations: {
     create: {
-      mutate: (data: Omit<License, 'id' | 'uploadedAt' | 'updatedAt'>) => Promise<License>;
+      mutate: (data: Omit<License, 'id' | 'createdAt' | 'updatedAt'>) => Promise<License>;
       loading: boolean;
       error: string | null;
     };
@@ -49,11 +42,6 @@ interface LicenseContextValue {
     };
     delete: {
       mutate: (id: string) => Promise<void>;
-      loading: boolean;
-      error: string | null;
-    };
-    process: {
-      mutate: (id: string) => Promise<License>;
       loading: boolean;
       error: string | null;
     };
@@ -84,15 +72,20 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
   });
 
   // License list query with pagination
-  const licensesQuery = useApiQuery<{ licenses: License[]; total: number }>(
-    `licenses-page-${pagination.page}-${pagination.pageSize}`,
-    `/licenses?page=${pagination.page}&limit=${pagination.pageSize}&offset=${pagination.offset}`,
+  const licensesQuery = useApiQuery<{ success: boolean; data: License[] }>(
+    `license-types-page-${pagination.page}-${pagination.pageSize}`,
+    '/license-types',
     {
       refetchOnMount: true,
       cacheTime: 2 * 60 * 1000, // 2 minutes cache
-      onSuccess: (data) => {
-        if (data?.total !== undefined) {
-          pagination.setTotal(data.total);
+      onSuccess: (response) => {
+        // Handle the nested response format
+        const licenses = response?.data || [];
+        console.log('[LicenseContext] API Response:', response);
+        console.log('[LicenseContext] Extracted licenses:', licenses);
+        console.log('[LicenseContext] Is array:', Array.isArray(licenses));
+        if (Array.isArray(licenses)) {
+          pagination.setTotal(licenses.length);
         }
       },
       onError: (error) => console.error('[LicenseContext] Failed to fetch licenses:', error),
@@ -105,109 +98,43 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
   // License fields management
   const licenseFields = useLicenseFields(currentLicenseData);
 
-  // Create license mutation
-  const createLicenseMutation = useApiMutation<License>(
-    '/licenses',
-    'POST',
-    {
-      onSuccess: () => {
-        licensesQuery.refetch();
-        console.log('[LicenseContext] License created successfully');
-      },
-      onError: (error) => console.error('[LicenseContext] Failed to create license:', error),
-    }
-  );
 
-  // Update license mutation
-  const updateLicenseMutation = useApiMutation<License>(
-    '',
-    'PUT',
-    {
-      onSuccess: () => {
-        licensesQuery.refetch();
-        console.log('[LicenseContext] License updated successfully');
-      },
-      onError: (error) => console.error('[LicenseContext] Failed to update license:', error),
+  // Custom mutation wrappers using licenseService
+  const createLicense = useCallback(async (licenseData: Omit<License, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const result = await licenseService.createLicense(licenseData as any);
+      await licensesQuery.refetch();
+      console.log('[LicenseContext] License created successfully');
+      return result;
+    } catch (error) {
+      console.error('[LicenseContext] Failed to create license:', error);
+      throw error;
     }
-  );
-
-  // Delete license mutation
-  const deleteLicenseMutation = useApiMutation<void>(
-    '',
-    'DELETE',
-    {
-      onSuccess: () => {
-        licensesQuery.refetch();
-        console.log('[LicenseContext] License deleted successfully');
-      },
-      onError: (error) => console.error('[LicenseContext] Failed to delete license:', error),
-    }
-  );
-
-  // Process license mutation
-  const processLicenseMutation = useApiMutation<License>(
-    '',
-    'POST',
-    {
-      onSuccess: () => {
-        licensesQuery.refetch();
-        console.log('[LicenseContext] License processed successfully');
-      },
-      onError: (error) => console.error('[LicenseContext] Failed to process license:', error),
-    }
-  );
-
-  // Custom mutation wrappers
-  const createLicense = useCallback(async (licenseData: Omit<License, 'id' | 'uploadedAt' | 'updatedAt'>) => {
-    return await createLicenseMutation.mutate(licenseData);
-  }, [createLicenseMutation]);
+  }, [licensesQuery]);
 
   const updateLicense = useCallback(async (data: { id: string; updates: Partial<License> }) => {
-    const endpoint = `/licenses/${data.id}`;
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'https://compliance-api-fybjasdddtcxhqfw.eastus2-01.azurewebsites.net/api/v1'}${endpoint}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data.updates),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update license: ${response.statusText}`);
+    try {
+      const result = await licenseService.updateLicense(data.id, data.updates as any);
+      await licensesQuery.refetch();
+      console.log('[LicenseContext] License updated successfully');
+      return result;
+    } catch (error) {
+      console.error('[LicenseContext] Failed to update license:', error);
+      throw error;
     }
-
-    const result = await response.json();
-    await licensesQuery.refetch();
-    return result;
   }, [licensesQuery]);
 
   const deleteLicense = useCallback(async (id: string) => {
-    const endpoint = `/licenses/${id}`;
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'https://compliance-api-fybjasdddtcxhqfw.eastus2-01.azurewebsites.net/api/v1'}${endpoint}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete license: ${response.statusText}`);
+    try {
+      await licenseService.deleteLicense(id);
+      await licensesQuery.refetch();
+      console.log('[LicenseContext] License deleted successfully');
+    } catch (error) {
+      console.error('[LicenseContext] Failed to delete license:', error);
+      throw error;
     }
-
-    await licensesQuery.refetch();
   }, [licensesQuery]);
 
-  const processLicense = useCallback(async (id: string) => {
-    const endpoint = `/licenses/${id}/process`;
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'https://compliance-api-fybjasdddtcxhqfw.eastus2-01.azurewebsites.net/api/v1'}${endpoint}`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to process license: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    await licensesQuery.refetch();
-    return result;
-  }, [licensesQuery]);
 
   // Actions
   const setCurrentLicense = useCallback((licenseData: LicenseData | null) => {
@@ -227,18 +154,7 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
   const clearAllErrors = useCallback(() => {
     licensesQuery.reset();
     licenseUpload.clearError();
-    createLicenseMutation.reset();
-    updateLicenseMutation.reset();
-    deleteLicenseMutation.reset();
-    processLicenseMutation.reset();
-  }, [
-    licensesQuery,
-    licenseUpload,
-    createLicenseMutation,
-    updateLicenseMutation,
-    deleteLicenseMutation,
-    processLicenseMutation
-  ]);
+  }, [licensesQuery, licenseUpload]);
 
   const contextValue: LicenseContextValue = {
     currentLicense: {
@@ -248,7 +164,7 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
     },
 
     licenses: {
-      data: licensesQuery.data?.licenses || null,
+      data: licensesQuery.data?.data || null, // Extract data from nested response
       loading: licensesQuery.loading,
       error: licensesQuery.error,
       pagination,
@@ -259,23 +175,18 @@ export const LicenseProvider: React.FC<LicenseProviderProps> = ({ children }) =>
     operations: {
       create: {
         mutate: createLicense,
-        loading: createLicenseMutation.loading,
-        error: createLicenseMutation.error,
+        loading: false, // We'll handle loading states in the individual functions if needed
+        error: null,
       },
       update: {
         mutate: updateLicense,
-        loading: updateLicenseMutation.loading,
-        error: updateLicenseMutation.error,
+        loading: false,
+        error: null,
       },
       delete: {
         mutate: deleteLicense,
-        loading: deleteLicenseMutation.loading,
-        error: deleteLicenseMutation.error,
-      },
-      process: {
-        mutate: processLicense,
-        loading: processLicenseMutation.loading,
-        error: processLicenseMutation.error,
+        loading: false,
+        error: null,
       },
     },
 

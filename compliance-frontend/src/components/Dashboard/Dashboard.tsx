@@ -1,7 +1,8 @@
 import  { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Box, Typography, Container, Paper } from '@mui/material';
-import StatusCard from '../StatusCard/StatusCard';
+import Grid from '@mui/material/Grid';
+import StatusCard from '../common/Dashboard/StatusCard';
 import type { License } from '../../types';
 
 const COLORS = ['#00A1FF', '#00B8A3', '#FFB900', '#FF8A00', '#8965E5'];

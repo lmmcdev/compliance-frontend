@@ -13,6 +13,7 @@ export {
   useCurrentLicense,
   useLicenses,
   useLicenseOperations,
+  type License,
 } from './LicenseContext';
 
 export {

@@ -26,6 +26,7 @@ import type { DataTableColumn } from './DataTable';
 import { useIncidents, useIncidentOperations, type Incident } from '../../../contexts/IncidentsContext';
 import { useDebounce } from '../../../hooks/patterns';
 import { styled } from '@mui/material/styles';
+import { getQuickTotalHours, getQuickTotalCost, formatHours, formatCurrency } from '../../../utils/workingHoursCalculator';
 
 const TableHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -304,6 +305,29 @@ export const IncidentsTable: React.FC<IncidentsTableProps> = ({
           sx={{ fontSize: '0.75rem' }}
         />
       ),
+    },
+    {
+      id: 'working_hours_total',
+      label: 'Working Hours',
+      minWidth: 140,
+      resizable: true,
+      sortable: true,
+      format: (_, row) => {
+        const totalHours = getQuickTotalHours(row);
+        const totalCost = getQuickTotalCost(row);
+        return (
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" fontWeight="medium">
+              {formatHours(totalHours)}
+            </Typography>
+            {totalCost > 0 && (
+              <Typography variant="caption" color="success.main">
+                {formatCurrency(totalCost)}
+              </Typography>
+            )}
+          </Box>
+        );
+      },
     },
   ], []);
 

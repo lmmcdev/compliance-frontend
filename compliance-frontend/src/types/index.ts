@@ -1,11 +1,16 @@
 export interface License {
   id: string;
-  type: string;
-  issuer: string;
-  issueDate: Date;
-  expirationDate: Date;
-  status: 'active' | 'expired' | 'pending';
-  documentUrl?: string;
+  code: string;
+  displayName: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  // Cosmos DB fields (optional)
+  _rid?: string;
+  _self?: string;
+  _etag?: string;
+  _attachments?: string;
+  _ts?: number;
 }
 
 export interface LicenseData {

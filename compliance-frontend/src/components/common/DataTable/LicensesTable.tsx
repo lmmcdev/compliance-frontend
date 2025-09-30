@@ -1,33 +1,18 @@
 import React, { useMemo } from 'react';
-import { Chip, IconButton, Box, Typography } from '@mui/material';
+import { IconButton, Box, Typography } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
-  Download as DownloadIcon,
-  PlayArrow as ProcessIcon,
 } from '@mui/icons-material';
 import { DataTable } from './DataTable';
 import type { DataTableColumn } from './DataTable';
-import { useLicenses, useLicenseOperations } from '../../../contexts';
-
-interface License {
-  id: string;
-  accountId: string;
-  documentType: string;
-  status: 'pending' | 'processed' | 'failed';
-  uploadedAt: string;
-  processedAt?: string;
-  createdBy: string;
-  updatedAt: string;
-}
+import { useLicenses, useLicenseOperations, type License } from '../../../contexts';
 
 interface LicensesTableProps {
   onEditLicense?: (license: License) => void;
   onViewLicense?: (license: License) => void;
   onDeleteLicense?: (license: License) => void;
-  onProcessLicense?: (license: License) => void;
-  onDownloadLicense?: (license: License) => void;
   selectable?: boolean;
   selectedLicenses?: Set<string>;
   onSelectionChange?: (selectedIds: Set<string>) => void;
@@ -37,21 +22,19 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
   onEditLicense,
   onViewLicense,
   onDeleteLicense,
-  onProcessLicense,
-  onDownloadLicense,
   selectable = false,
   selectedLicenses = new Set(),
   onSelectionChange,
 }) => {
   // Data hooks
   const { data: licenses, loading, error, refresh, pagination } = useLicenses();
-  const { delete: deleteOperation, process: processOperation } = useLicenseOperations();
+  const { delete: deleteOperation } = useLicenseOperations();
 
   // Table columns definition
   const columns: DataTableColumn<License>[] = useMemo(() => [
     {
-      id: 'documentType',
-      label: 'Document Type',
+      id: 'code',
+      label: 'License Code',
       minWidth: 150,
       format: (value) => (
         <Typography variant="body2" fontWeight="medium">
@@ -60,61 +43,31 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
       ),
     },
     {
-      id: 'status',
-      label: 'Status',
-      minWidth: 120,
-      format: (value) => {
-        const getStatusColor = (status: string) => {
-          switch (status) {
-            case 'processed': return 'success';
-            case 'pending': return 'warning';
-            case 'failed': return 'error';
-            default: return 'default';
-          }
-        };
-
-        return (
-          <Chip
-            label={value || 'Unknown'}
-            size="small"
-            color={getStatusColor(value)}
-            variant="filled"
-          />
-        );
-      },
-    },
-    {
-      id: 'accountId',
-      label: 'Account',
-      minWidth: 150,
+      id: 'displayName',
+      label: 'Display Name',
+      minWidth: 180,
       format: (value) => (
-        <Typography variant="body2" color="text.secondary">
-          {value ? `Account: ${value.substring(0, 8)}...` : 'No Account'}
+        <Typography variant="body2" fontWeight="medium">
+          {value || 'Unknown'}
         </Typography>
       ),
     },
     {
-      id: 'createdBy',
-      label: 'Created By',
-      minWidth: 130,
-      format: (value) => value || 'System',
+      id: 'description',
+      label: 'Description',
+      minWidth: 250,
+      format: (value) => (
+        <Typography variant="body2" color="text.secondary">
+          {value || 'No description'}
+        </Typography>
+      ),
     },
     {
-      id: 'uploadedAt',
-      label: 'Uploaded',
+      id: 'createdAt',
+      label: 'Created',
       minWidth: 130,
       format: (value) => {
         if (!value) return 'Never';
-        const date = new Date(value);
-        return date.toLocaleDateString();
-      },
-    },
-    {
-      id: 'processedAt',
-      label: 'Processed',
-      minWidth: 130,
-      format: (value) => {
-        if (!value) return 'Not processed';
         const date = new Date(value);
         return date.toLocaleDateString();
       },
@@ -144,33 +97,11 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
         </IconButton>
       )}
 
-      {onDownloadLicense && (
-        <IconButton
-          size="small"
-          onClick={() => onDownloadLicense(license)}
-          title="Download license document"
-        >
-          <DownloadIcon fontSize="small" />
-        </IconButton>
-      )}
-
-      {onProcessLicense && license.status === 'pending' && (
-        <IconButton
-          size="small"
-          onClick={() => handleProcessLicense(license)}
-          title="Process license"
-          color="primary"
-          disabled={processOperation.loading}
-        >
-          <ProcessIcon fontSize="small" />
-        </IconButton>
-      )}
-
       {onEditLicense && (
         <IconButton
           size="small"
           onClick={() => onEditLicense(license)}
-          title="Edit license"
+          title="Edit license type"
         >
           <EditIcon fontSize="small" />
         </IconButton>
@@ -180,7 +111,7 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
         <IconButton
           size="small"
           onClick={() => handleDeleteLicense(license)}
-          title="Delete license"
+          title="Delete license type"
           color="error"
           disabled={deleteOperation.loading}
         >
@@ -190,12 +121,9 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
     </Box>
   ), [
     onViewLicense,
-    onDownloadLicense,
-    onProcessLicense,
     onEditLicense,
     onDeleteLicense,
     deleteOperation.loading,
-    processOperation.loading,
   ]);
 
   // Action handlers
@@ -210,20 +138,9 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
     }
   };
 
-  const handleProcessLicense = async (license: License) => {
-    if (!onProcessLicense) return;
-
-    try {
-      await processOperation.mutate(license.id);
-      onProcessLicense(license);
-    } catch (error) {
-      console.error('Failed to process license:', error);
-    }
-  };
-
   return (
     <DataTable<License>
-      title="Licenses"
+      title="License Types"
       data={licenses}
       columns={columns}
       loading={loading}
@@ -235,7 +152,7 @@ export const LicensesTable: React.FC<LicensesTableProps> = ({
       getItemId={(license) => license.id}
       onRefresh={refresh}
       rowActions={rowActions}
-      emptyMessage="No licenses found. Upload your first license document to get started."
+      emptyMessage="No license types found. Add your first license type to get started."
       density="normal"
     />
   );
