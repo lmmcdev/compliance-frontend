@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { PublicClientApplication } from '@azure/msal-browser';
-import { useMsal, useAccount } from '@azure/msal-react';
+import { useMsal, useAccount, useIsAuthenticated } from '@azure/msal-react';
 
 // ----------------------
 // Types
@@ -50,6 +50,7 @@ interface AuthContextType {
   accessToken: string | null;
   userRoles: string[] | null;
   tokenPayload: any | null;
+  isLoading: boolean;
   login: () => Promise<void>;
   logout: () => void;
   getAccessToken: () => Promise<string | null>;
@@ -90,14 +91,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Provider
 // ----------------------
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { instance, accounts } = useMsal();
+  const { instance, accounts, inProgress } = useMsal();
   const account = useAccount(accounts[0] || {});
+  const isAuthenticated = useIsAuthenticated();
   const [authError, setAuthError] = useState<AuthError | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<string[] | null>(null);
   const [tokenPayload, setTokenPayload] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!account;
+  // Handle initialization loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000); // Give MSAL time to initialize
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Update loading state based on MSAL progress
+  useEffect(() => {
+    if (inProgress === 'none') {
+      setIsLoading(false);
+    }
+  }, [inProgress]);
 
   const handleAuthError = useCallback((error: any) => {
     const authError: AuthError = {
@@ -242,6 +259,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         accessToken,
         userRoles,
         tokenPayload,
+        isLoading,
         login,
         logout,
         getAccessToken,

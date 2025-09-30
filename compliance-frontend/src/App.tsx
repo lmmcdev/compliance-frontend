@@ -17,8 +17,43 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
+const LoadingSpinner = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      flexDirection: 'column',
+      gap: 2
+    }}
+  >
+    <Box
+      sx={{
+        width: 40,
+        height: 40,
+        border: '4px solid #e2e8f0',
+        borderTop: '4px solid #00A1FF',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        '@keyframes spin': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      }}
+    />
+    <Box sx={{ color: '#64748b', fontSize: '14px' }}>
+      Loading application...
+    </Box>
+  </Box>
+);
+
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Layout>

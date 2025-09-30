@@ -29,36 +29,40 @@ declare module '@mui/material/styles' {
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
-    },
+      main: '#00A1FF',
+      light: '#BAE7FF',
+      dark: '#0080CC',
+      50: '#E6F7FF',
+      200: '#BAE7FF',
+      500: '#00A1FF',
+      600: '#0080CC',
+    } as any,
     secondary: {
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036',
+      main: '#8965E5',
+      light: '#EAE8FA',
+      dark: '#6200EA',
     },
     error: {
-      main: '#f44336',
+      main: '#f46a6a',
     },
     warning: {
-      main: '#ff9800',
+      main: '#ffb900',
     },
     success: {
-      main: '#4caf50',
+      main: '#00b8a3',
     },
     background: {
-      default: '#f8f9fa',
+      default: '#f8fafc',
       paper: '#ffffff',
     },
     status: {
-      new: '#fce4ec',      // Pink background for "New" cards
-      emergency: '#fff3e0',  // Orange background for "Emergency" cards
-      inProgress: '#e3f2fd', // Light blue background for "In Progress" cards
-      pending: '#f3e5f5',   // Purple background for "Pending" cards
-      done: '#e8f5e8',      // Green background for "Done" cards
-      duplicated: '#fff3e0', // Orange background for "Duplicated" cards
-      total: '#e3f2fd',     // Blue background for "Total" cards
+      new: '#FFE2EA',        // Matching maintenance-frontend colors
+      emergency: '#FFF5DA',
+      inProgress: '#DFF3FF',
+      pending: '#EAE8FA',
+      done: '#DAF8F4',
+      duplicated: '#FFE3C4',
+      total: '#DFF3FF',
     },
   },
   typography: {

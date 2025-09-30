@@ -1,11 +1,10 @@
 import  { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Box, Typography, Container, Paper } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import StatusCard from '../StatusCard/StatusCard';
 import type { License } from '../../types';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['#00A1FF', '#00B8A3', '#FFB900', '#FF8A00', '#8965E5'];
 
 // Inline DashboardMetrics type to avoid import issues
 interface DashboardMetrics {
@@ -53,50 +52,50 @@ const Dashboard = () => {
       count: 476,
       label: 'New',
       status: 'new' as const,
-      leftBorderColor: '#e91e63',
-      chipColor: '#e91e63',
+      leftBorderColor: '#FF6692',
+      chipColor: '#FF6692',
     },
     {
       count: 5,
       label: 'Emergency',
       status: 'emergency' as const,
-      leftBorderColor: '#ff9800',
-      chipColor: '#ff9800',
+      leftBorderColor: '#FFB900',
+      chipColor: '#FFB900',
     },
     {
       count: 11,
       label: 'In Progress',
       status: 'inProgress' as const,
-      leftBorderColor: '#2196f3',
-      chipColor: '#2196f3',
+      leftBorderColor: '#00A1FF',
+      chipColor: '#00A1FF',
     },
     {
       count: 9,
       label: 'Pending',
       status: 'pending' as const,
-      leftBorderColor: '#9c27b0',
-      chipColor: '#9c27b0',
+      leftBorderColor: '#8965E5',
+      chipColor: '#8965E5',
     },
     {
       count: 0,
       label: 'Done',
       status: 'done' as const,
-      leftBorderColor: '#4caf50',
-      chipColor: '#4caf50',
+      leftBorderColor: '#00B8A3',
+      chipColor: '#00B8A3',
     },
     {
       count: 0,
       label: 'Duplicated',
       status: 'duplicated' as const,
-      leftBorderColor: '#ff9800',
-      chipColor: '#ff9800',
+      leftBorderColor: '#FF8A00',
+      chipColor: '#FF8A00',
     },
     {
       count: metrics?.totalLicenses ?? DEFAULT_TOTAL_LICENSES,
       label: 'Total',
       status: 'total' as const,
-      leftBorderColor: '#1976d2',
-      chipColor: '#1976d2',
+      leftBorderColor: '#00A1FF',
+      chipColor: '#00A1FF',
     },
   ];
 
@@ -126,9 +125,17 @@ const Dashboard = () => {
         gap: 2,
         mb: 4,
         width: '100%',
+        flexWrap: { xs: 'wrap', md: 'nowrap' },
         '& > *': {
-          flex: '1 1 0',
-          minWidth: 0,
+          flex: { xs: '1 1 calc(50% - 8px)', md: '1 1 0' },
+          minWidth: { xs: 'calc(50% - 8px)', md: 0 },
+        },
+        '@media (max-width: 475px)': {
+          flexDirection: 'column',
+          '& > *': {
+            flex: '1 1 auto',
+            minWidth: 'auto',
+          }
         }
       }}>
         {statusCardsData.map((card, index) => (
@@ -144,68 +151,68 @@ const Dashboard = () => {
       </Box>
 
       {/* Charts Section */}
-      <Grid container spacing={3} sx={{ width: '100%' }}>
-        <Grid>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Licenses by Type
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={metrics.licensesByType}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={(props: any) => `${props.name} ${props.percent !== undefined ? (props.percent * 100).toFixed(0) : '0'}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="count"
-                >
-                  {metrics.licensesByType.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+        gap: 3,
+        width: '100%',
+        mb: 4
+      }}>
+        <Paper sx={{ p: { xs: 2, md: 3 } }}>
+          <Typography variant="h6" gutterBottom>
+            Licenses by Type
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={metrics.licensesByType}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={(props: any) => `${props.name} ${props.percent !== undefined ? (props.percent * 100).toFixed(0) : '0'}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="count"
+              >
+                {metrics.licensesByType.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </Paper>
 
-        <Grid>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              License Distribution
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={metrics.licensesByType}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+        <Paper sx={{ p: { xs: 2, md: 3 } }}>
+          <Typography variant="h6" gutterBottom>
+            License Distribution
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={metrics.licensesByType}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#00A1FF" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Paper>
+      </Box>
 
-        <Grid>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Compliance Cases per Month
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={metrics.complianceCasesByMonth}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#8884d8" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Paper sx={{ p: { xs: 2, md: 3 } }}>
+        <Typography variant="h6" gutterBottom>
+          Compliance Cases per Month
+        </Typography>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={metrics.complianceCasesByMonth}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="count" stroke="#00A1FF" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      </Paper>
     </Box>
   );
 };
