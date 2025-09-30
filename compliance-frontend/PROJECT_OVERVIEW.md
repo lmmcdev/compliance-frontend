@@ -35,11 +35,11 @@ The Compliance Frontend is a modern React TypeScript application built with ente
 
 ### API Management System
 
-#### Universal Hooks (`src/hooks/api/`)
+#### Data Hooks (`src/hooks/data/`)
 
-**`useApi`** - Central API hook with Azure Functions integration
+**`useAuthenticatedApi`** - Central API hook with Azure Functions authentication
 ```typescript
-const { client, isConnected, error } = useApi();
+const { client, isConnected, error } = useAuthenticatedApi();
 ```
 
 **`useApiQuery`** - Data fetching with caching and error handling
@@ -53,6 +53,16 @@ const { mutate, loading, error } = useApiMutation('/users', 'POST', {
   onSuccess: (data) => console.log('Created:', data),
   onError: (error) => console.error('Failed:', error)
 });
+```
+
+**`usePagination`** - Pagination management for data tables
+```typescript
+const { page, pageSize, handlePageChange, handlePageSizeChange } = usePagination();
+```
+
+**`useSearch`** - Search functionality with debouncing
+```typescript
+const { searchTerm, debouncedSearchTerm, handleSearch } = useSearch();
 ```
 
 #### Domain Contexts (`src/contexts/`)
@@ -74,12 +84,6 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 
 ### Service Layer (`src/services/`)
 
-**`apiClient.ts`** - Centralized Azure Functions client
-- Automatic authentication handling
-- Request/response interceptors
-- Error standardization
-- Retry logic
-
 **`licenseService.ts`** - Consolidated license operations (Single API source)
 - All license CRUD operations using `/license-types` endpoints
 - Handles nested API response format: `{ success: true, data: [...] }`
@@ -87,10 +91,25 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 - Type-safe operations with proper error handling
 - Eliminates API call duplication between service and context layers
 
+**`accountsService.ts`** - Account management operations
+- Account CRUD operations
+- Azure Functions integration
+- Type-safe account operations
+
+**`complianceService.ts`** - Compliance data operations
+- Compliance form submissions
+- Data validation and processing
+
+**`cosmosDbService.ts`** - Cosmos DB direct access
+- Database operations
+- Query management
+- Data persistence
+
 **`fileUploadService.ts`** - File upload functionality
 - Multi-file support
 - Progress tracking
 - Validation and error handling
+- Temporary file upload to Azure
 
 ## Component Systems
 
@@ -160,10 +179,32 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 - Error handling
 - Responsive layout
 
+**`ExtractedFieldsForm/`** - Specialized form for extracted license fields
+- Dynamic field rendering based on license type
+- Integration with license data extraction
+- Validation for extracted data
+
 Field types supported:
 - `text`, `email`, `password`, `number`, `tel`, `url`
 - `textarea`, `select`, `multiselect`
 - `checkbox`, `radio`, `date`, `file`
+
+### Input Components (`src/components/common/Inputs/`)
+
+**`AccountSelection/`** - Account selection component
+- Searchable account dropdown
+- Integration with AccountContext
+- Multi-select support
+
+**`FileUpload/`** - File upload component
+- Drag-and-drop support
+- Multiple file upload
+- Progress indicators
+- File type validation
+
+### Display Components (`src/components/common/Display/`)
+
+Various display components for presenting data in different formats
 
 ### Dashboard System (`src/components/common/Dashboard/`)
 
@@ -364,6 +405,64 @@ const [state, setState, removeState] = usePersistentState('key', initialValue, {
 });
 ```
 
+### License Management Hooks (`src/hooks/`)
+
+**`useLicenseFields`** - License field management
+```typescript
+const { fields, updateField, validateFields } = useLicenseFields(licenseType);
+```
+
+**`useLicenseUpload`** - License upload workflow management
+```typescript
+const { uploadLicense, uploadProgress, uploadError } = useLicenseUpload();
+```
+
+**`useWizardFlow`** - Multi-step wizard flow management
+```typescript
+const { currentStep, nextStep, prevStep, goToStep, isLastStep } = useWizardFlow(totalSteps);
+```
+
+### Middleware Layer (`src/middleware/`)
+
+Middleware components for request/response processing, authentication guards, and route protection.
+
+### Theme Configuration (`src/theme/`)
+
+Material-UI theme customization and styling configurations:
+- Color palettes
+- Typography settings
+- Component overrides
+- Responsive breakpoints
+
+### Additional Page Components
+
+**`Auth/`** - Authentication components
+- Login/logout forms
+- Protected route wrappers
+- Authentication status displays
+
+**`ComplianceForm/`** - Compliance-specific form components
+- Pre-configured compliance data entry forms
+- Compliance validation rules
+
+**`Dashboard/`** - Dashboard page components
+- Main dashboard layout
+- Dashboard-specific widgets
+
+**`Layout/`** - Application layout components
+- Navigation bars
+- Sidebars
+- Page containers
+- Responsive layouts
+
+**`LicenseManagement/`** - License management pages
+- LicensesPage with integrated table and dialogs
+- License workflow management
+
+**`Incident/`** - Incident management pages
+- IncidentsPage with integrated table and dialogs
+- Incident workflow management
+
 ## Project Structure
 
 ```
@@ -386,16 +485,27 @@ compliance-frontend/
 │   │   │   │   ├── Dashboard.tsx
 │   │   │   │   ├── MetricCard.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── Display/            # Display components
 │   │   │   ├── Forms/              # Form system
 │   │   │   │   ├── FormBuilder.tsx
 │   │   │   │   ├── FormField.tsx
+│   │   │   │   ├── ExtractedFieldsForm/
 │   │   │   │   └── index.ts
-│   │   │   └── Layout/             # Layout system
-│   │   │       ├── ResponsiveContainer.tsx
-│   │   │       └── index.ts
+│   │   │   ├── Inputs/             # Input components
+│   │   │   │   ├── AccountSelection/
+│   │   │   │   ├── FileUpload/
+│   │   │   │   └── index.ts
+│   │   │   ├── Layout/             # Layout system
+│   │   │   │   ├── ResponsiveContainer.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── index.ts
+│   │   ├── Auth/                   # Authentication components
+│   │   ├── ComplianceForm/         # Compliance form components
+│   │   ├── Dashboard/              # Dashboard page components
 │   │   ├── Incident/               # Incident management
 │   │   │   └── IncidentsPage.tsx
-│   │   └── License/                # License management
+│   │   ├── Layout/                 # Layout components
+│   │   └── LicenseManagement/      # License management
 │   │       └── LicensesPage.tsx
 │   ├── contexts/                   # Domain contexts
 │   │   ├── LicenseContext.tsx      # License management state
@@ -406,35 +516,51 @@ compliance-frontend/
 │   │   ├── DataContext.tsx         # Legacy data context
 │   │   └── index.ts
 │   ├── hooks/
-│   │   ├── api/                    # API hooks
-│   │   │   ├── useApi.ts
-│   │   │   ├── useApiQuery.ts
-│   │   │   ├── useApiMutation.ts
-│   │   │   └── index.ts
 │   │   ├── data/                   # Data hooks
+│   │   │   ├── useApiMutation.ts
+│   │   │   ├── useApiQuery.ts
+│   │   │   ├── useAuthenticatedApi.ts
+│   │   │   ├── usePagination.ts
+│   │   │   ├── useSearch.ts
 │   │   │   └── index.ts
 │   │   ├── optimization/           # Performance hooks
 │   │   │   ├── useMemoCompare.ts
 │   │   │   ├── useVirtualization.ts
 │   │   │   ├── usePerformanceMonitor.ts
 │   │   │   └── index.ts
-│   │   └── patterns/               # Advanced patterns
-│   │       ├── useSelection.ts
-│   │       ├── useLayout.ts
-│   │       ├── useAsync.ts
-│   │       ├── useDebounce.ts
-│   │       ├── usePersistentState.ts
-│   │       └── index.ts
+│   │   ├── patterns/               # Advanced patterns
+│   │   │   ├── useSelection.ts
+│   │   │   ├── useLayout.ts
+│   │   │   ├── useAsync.ts
+│   │   │   ├── useDebounce.ts
+│   │   │   ├── usePersistentState.ts
+│   │   │   └── index.ts
+│   │   ├── useLicenseFields.ts     # License fields hook
+│   │   ├── useLicenseUpload.ts     # License upload hook
+│   │   └── useWizardFlow.ts        # Wizard flow hook
+│   ├── middleware/                 # Middleware layer
 │   ├── services/                   # Service layer
-│   │   ├── apiClient.ts
-│   │   ├── fileUploadService.ts
 │   │   ├── accountsService.ts
+│   │   ├── complianceService.ts
+│   │   ├── cosmosDbService.ts
+│   │   ├── fileUploadService.ts
 │   │   ├── licenseService.ts
+│   │   ├── README-AzureFunctions.md
 │   │   └── index.ts
+│   ├── theme/                      # Theme configuration
+│   ├── types/                      # TypeScript definitions
 │   ├── utils/                      # Utility functions
 │   │   ├── workingHoursCalculator.ts
 │   │   └── index.ts
-│   └── types/                      # TypeScript definitions
+│   ├── assets/                     # Static assets
+│   ├── App.tsx
+│   ├── App.css
+│   ├── main.tsx
+│   ├── index.css
+│   └── vite-env.d.ts
+├── public/                         # Public assets
+├── dist/                           # Build output
+├── node_modules/                   # Dependencies
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
@@ -447,7 +573,7 @@ compliance-frontend/
 
 ```typescript
 import { DataTable } from '@/components/common/DataTable';
-import { useApiQuery } from '@/hooks/api';
+import { useApiQuery } from '@/hooks/data';
 
 interface User {
   id: string;
