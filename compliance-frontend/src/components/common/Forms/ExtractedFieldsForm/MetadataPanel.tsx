@@ -5,11 +5,16 @@ import {
   Paper,
   Grid,
   LinearProgress,
+  Chip,
+  Divider,
 } from '@mui/material';
 import {
   Description as FileIcon,
   Info as InfoIcon,
   VerifiedUser as VerifiedIcon,
+  Source as ModelIcon,
+  Api as ApiIcon,
+  DocumentScanner as DocumentIcon,
 } from '@mui/icons-material';
 import type { MetadataPanelProps } from './types';
 
@@ -34,6 +39,12 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
     return 'error';
   };
 
+  // Extract analyzeResult metadata if available
+  const analyzeResult = (metadata as any).analyzeResult;
+  const modelId = (metadata as any).modelId || analyzeResult?.modelId;
+  const apiVersion = (metadata as any).apiVersion || analyzeResult?.apiVersion;
+  const documentsCount = (metadata as any).documentsCount || analyzeResult?.documentsCount;
+
   return (
     <Paper
       elevation={0}
@@ -56,7 +67,7 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
                 Document Type
               </Typography>
               <Typography variant="body2" fontWeight={600}>
-                {metadata.licenseType || metadata.documentType || 'General License'}
+                {modelId || metadata.licenseType || metadata.documentType || 'General License'}
               </Typography>
             </Box>
           </Box>
@@ -102,6 +113,48 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
           </Grid>
         )}
       </Grid>
+
+      {/* Analyze Result Details */}
+      {(modelId || apiVersion || documentsCount !== undefined) && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Box>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
+              <ModelIcon fontSize="small" />
+              Analysis Details
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+              {modelId && (
+                <Chip
+                  icon={<ModelIcon fontSize="small" />}
+                  label={`Model: ${modelId}`}
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                />
+              )}
+              {apiVersion && (
+                <Chip
+                  icon={<ApiIcon fontSize="small" />}
+                  label={`API: ${apiVersion}`}
+                  size="small"
+                  variant="outlined"
+                  color="default"
+                />
+              )}
+              {documentsCount !== undefined && (
+                <Chip
+                  icon={<DocumentIcon fontSize="small" />}
+                  label={`${documentsCount} ${documentsCount === 1 ? 'document' : 'documents'}`}
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                />
+              )}
+            </Box>
+          </Box>
+        </>
+      )}
     </Paper>
   );
 };
