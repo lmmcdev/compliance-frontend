@@ -8,12 +8,9 @@ import {
   Fab,
   Tooltip,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
   IconButton,
   TextField,
-  Divider,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -35,25 +32,8 @@ const PageContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[50],
 }));
 
-const PageHeader = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
-  color: theme.palette.success.contrastText,
-  position: 'relative',
-  overflow: 'hidden',
-}));
 
-const HeaderContent = styled(Box)(() => ({
-  position: 'relative',
-  zIndex: 1,
-}));
 
-const HeaderActions = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(1),
-  marginTop: theme.spacing(2),
-}));
 
 const FloatingActions = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -65,32 +45,9 @@ const FloatingActions = styled(Box)(({ theme }) => ({
   zIndex: theme.zIndex.speedDial,
 }));
 
-const StatsContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(3),
-  marginTop: theme.spacing(2),
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    gap: theme.spacing(1),
-  },
-}));
 
-const StatItem = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
 
-const StatValue = styled(Typography)(() => ({
-  fontSize: '2rem',
-  fontWeight: 'bold',
-  lineHeight: 1,
-}));
 
-const StatLabel = styled(Typography)(() => ({
-  fontSize: '0.875rem',
-  opacity: 0.9,
-}));
 
 interface LicensesPageContentProps {}
 
