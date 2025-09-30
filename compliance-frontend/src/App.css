@@ -62,10 +62,10 @@ body {
 /* Sidebar Navigation */
 .sidebar {
   position: fixed;
-  top: 72px;
+  top: 65px;
   left: 0;
   width: 250px;
-  height: calc(100vh - 72px);
+  height: calc(100vh - 65px);
   background: #34495e;
   box-shadow: 2px 0 4px rgba(0,0,0,0.1);
 }

@@ -21,29 +21,10 @@ import { useSelection } from '../../hooks/patterns';
 
 const PageContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
-  minHeight: '100vh',
+  minHeight: '100%',
   backgroundColor: theme.palette.grey[50],
 }));
 
-const PageHeader = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-  color: theme.palette.primary.contrastText,
-  position: 'relative',
-  overflow: 'hidden',
-}));
-
-const HeaderContent = styled(Box)(() => ({
-  position: 'relative',
-  zIndex: 1,
-}));
-
-const HeaderActions = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(1),
-  marginTop: theme.spacing(2),
-}));
 
 const FloatingActions = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -53,33 +34,6 @@ const FloatingActions = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(1),
   zIndex: theme.zIndex.speedDial,
-}));
-
-const StatsContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(3),
-  marginTop: theme.spacing(2),
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    gap: theme.spacing(1),
-  },
-}));
-
-const StatItem = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
-const StatValue = styled(Typography)(() => ({
-  fontSize: '2rem',
-  fontWeight: 'bold',
-  lineHeight: 1,
-}));
-
-const StatLabel = styled(Typography)(() => ({
-  fontSize: '0.875rem',
-  opacity: 0.9,
 }));
 
 interface IncidentsPageContentProps {}
@@ -180,69 +134,152 @@ const IncidentsPageContent: React.FC<IncidentsPageContentProps> = () => {
   return (
     <PageContainer>
       {/* Page Header */}
-      <PageHeader elevation={2}>
-        <HeaderContent>
-          <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
-            Incident Management
-          </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.9 }}>
-            Track, manage, and resolve security and operational incidents
-          </Typography>
-
-          {/* Statistics */}
-          <StatsContainer>
-            <StatItem>
-              <StatValue>{stats.total}</StatValue>
-              <StatLabel>Total Incidents</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatValue color="error">{stats.open}</StatValue>
-              <StatLabel>Open</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatValue color="warning">{stats.critical}</StatValue>
-              <StatLabel>Critical</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatValue>{stats.unassigned}</StatValue>
-              <StatLabel>Unassigned</StatLabel>
-            </StatItem>
-          </StatsContainer>
-
-          <HeaderActions>
+      <Box sx={{
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+        borderRadius: '16px',
+        p: 4,
+        mb: 3,
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+          <Box>
+            <Typography
+              variant="h3"
+              component="h1"
+              sx={{
+                fontWeight: 700,
+                color: '#1e293b',
+                mb: 1,
+                fontSize: { xs: '2rem', md: '2.5rem' }
+              }}
+            >
+              Incident Management
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#64748b',
+                fontWeight: 400,
+                fontSize: '16px'
+              }}
+            >
+              Track, manage, and resolve security and operational incidents efficiently
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Button
               variant="contained"
-              color="inherit"
               startIcon={<AddIcon />}
               onClick={handleCreateIncident}
               sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                borderRadius: '12px',
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                py: 1.5,
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
                 '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                  boxShadow: '0 6px 16px rgba(245, 158, 11, 0.4)',
+                  transform: 'translateY(-1px)',
                 },
+                transition: 'all 0.2s ease-in-out',
               }}
             >
               New Incident
             </Button>
             <Button
               variant="outlined"
-              color="inherit"
               startIcon={<RefreshIcon />}
               onClick={refresh}
               disabled={loading}
               sx={{
-                borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderColor: '#E2E8F0',
+                color: '#64748b',
+                borderRadius: '12px',
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                py: 1.5,
                 '&:hover': {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  borderColor: '#00A1FF',
+                  backgroundColor: '#F8FAFC',
+                  color: '#00A1FF',
                 },
               }}
             >
               Refresh
             </Button>
-          </HeaderActions>
-        </HeaderContent>
-      </PageHeader>
+          </Box>
+        </Box>
+
+        {/* Modern Statistics Cards */}
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gap: 3,
+          mt: 3
+        }}>
+          <Box sx={{
+            p: 3,
+            borderRadius: '12px',
+            backgroundColor: '#F0F9FF',
+            border: '1px solid #BAE6FD',
+            textAlign: 'center'
+          }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#0369A1', mb: 1 }}>
+              {stats.total}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#0F172A', fontWeight: 500 }}>
+              Total Incidents
+            </Typography>
+          </Box>
+          <Box sx={{
+            p: 3,
+            borderRadius: '12px',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FECACA',
+            textAlign: 'center'
+          }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#DC2626', mb: 1 }}>
+              {stats.open}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#0F172A', fontWeight: 500 }}>
+              Open Cases
+            </Typography>
+          </Box>
+          <Box sx={{
+            p: 3,
+            borderRadius: '12px',
+            backgroundColor: '#FFFBEB',
+            border: '1px solid #FED7AA',
+            textAlign: 'center'
+          }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#D97706', mb: 1 }}>
+              {stats.critical}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#0F172A', fontWeight: 500 }}>
+              Critical Impact
+            </Typography>
+          </Box>
+          <Box sx={{
+            p: 3,
+            borderRadius: '12px',
+            backgroundColor: '#F3F4F6',
+            border: '1px solid #D1D5DB',
+            textAlign: 'center'
+          }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#6B7280', mb: 1 }}>
+              {stats.unassigned}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#0F172A', fontWeight: 500 }}>
+              Unassigned
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
       {/* Main Content */}
       <Paper elevation={1} sx={{ p: 0, overflow: 'hidden' }}>

@@ -29,32 +29,75 @@ import { styled } from '@mui/material/styles';
 import { getQuickTotalHours, getQuickTotalCost, formatHours, formatCurrency } from '../../../utils/workingHoursCalculator';
 
 const TableHeader = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+  borderRadius: '16px',
+  padding: theme.spacing(3),
   marginBottom: theme.spacing(3),
-  gap: theme.spacing(2),
-  flexWrap: 'wrap',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
+  border: '1px solid #E2E8F0',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+}));
+
+const HeaderTitle = styled(Box)(() => ({
+  marginBottom: '20px',
 }));
 
 const FilterControls = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
   alignItems: 'center',
-  [theme.breakpoints.down('sm')]: {
+  flexWrap: 'wrap',
+  [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'stretch',
-    width: '100%',
+    gap: theme.spacing(1.5),
   },
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
-  minWidth: 300,
-  [theme.breakpoints.down('sm')]: {
+  minWidth: 320,
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#f8fafc',
+    },
+    '&.Mui-focused': {
+      backgroundColor: '#ffffff',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#00A1FF',
+        borderWidth: '2px',
+      },
+    },
+  },
+  [theme.breakpoints.down('md')]: {
+    minWidth: 'auto',
+    width: '100%',
+  },
+}));
+
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  minWidth: 140,
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#f8fafc',
+    },
+    '&.Mui-focused': {
+      backgroundColor: '#ffffff',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#00A1FF',
+        borderWidth: '2px',
+      },
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: '#64748b',
+    '&.Mui-focused': {
+      color: '#00A1FF',
+    },
+  },
+  [theme.breakpoints.down('md')]: {
     minWidth: 'auto',
     width: '100%',
   },
@@ -406,37 +449,56 @@ export const IncidentsTable: React.FC<IncidentsTableProps> = ({
   // Custom table header with search and filters
   const tableHeader = (
     <TableHeader>
-      <Typography variant="h5" component="h2" fontWeight="bold">
-        Incidents
+      <HeaderTitle>
+        <Typography
+          variant="h5"
+          component="h2"
+          sx={{
+            fontWeight: 700,
+            color: '#1e293b',
+            fontSize: '1.5rem'
+          }}
+        >
+          Incidents Overview
+        </Typography>
         {pagination.totalLoaded > 0 && (
-          <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            ({pagination.totalLoaded} loaded{pagination.hasMore ? ', more available' : ''})
+          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+            {pagination.totalLoaded} incidents loaded{pagination.hasMore ? ', more available' : ''}
           </Typography>
         )}
-      </Typography>
+      </HeaderTitle>
 
       <FilterControls>
         <SearchField
-          placeholder="Search incidents..."
+          placeholder="Search by title, description, or agent..."
           value={localSearchQuery}
           onChange={(e) => setLocalSearchQuery(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon />
+                <SearchIcon sx={{ color: '#64748b' }} />
               </InputAdornment>
             ),
           }}
           variant="outlined"
-          size="small"
+          size="medium"
         />
 
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Status</InputLabel>
+        <StyledFormControl size="medium">
+          <InputLabel>Status Filter</InputLabel>
           <Select
             value={statusFilter}
-            label="Status"
+            label="Status Filter"
             onChange={(e) => setStatusFilter(e.target.value)}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                  mt: 1,
+                },
+              },
+            }}
           >
             <MenuItem value="all">All Statuses</MenuItem>
             <MenuItem value="Read">Read</MenuItem>
@@ -444,14 +506,23 @@ export const IncidentsTable: React.FC<IncidentsTableProps> = ({
             <MenuItem value="In Progress">In Progress</MenuItem>
             <MenuItem value="Resolved">Resolved</MenuItem>
           </Select>
-        </FormControl>
+        </StyledFormControl>
 
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Priority</InputLabel>
+        <StyledFormControl size="medium">
+          <InputLabel>Priority Filter</InputLabel>
           <Select
             value={priorityFilter}
-            label="Priority"
+            label="Priority Filter"
             onChange={(e) => setPriorityFilter(e.target.value)}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+                  mt: 1,
+                },
+              },
+            }}
           >
             <MenuItem value="all">All Priorities</MenuItem>
             <MenuItem value="Low">Low</MenuItem>
@@ -459,7 +530,7 @@ export const IncidentsTable: React.FC<IncidentsTableProps> = ({
             <MenuItem value="High">High</MenuItem>
             <MenuItem value="Urgent">Urgent</MenuItem>
           </Select>
-        </FormControl>
+        </StyledFormControl>
       </FilterControls>
     </TableHeader>
   );
@@ -484,12 +555,30 @@ export const IncidentsTable: React.FC<IncidentsTableProps> = ({
 
       {/* Load More Button */}
       {pagination.hasMore && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, pt: 4 }}>
           <Button
             variant="outlined"
             onClick={loadMore}
             disabled={loading}
-            sx={{ minWidth: 200 }}
+            sx={{
+              minWidth: 200,
+              borderRadius: '12px',
+              borderColor: '#E2E8F0',
+              color: '#64748b',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              py: 1.5,
+              '&:hover': {
+                borderColor: '#00A1FF',
+                backgroundColor: '#F8FAFC',
+                color: '#00A1FF',
+              },
+              '&:disabled': {
+                borderColor: '#E2E8F0',
+                color: '#94A3B8',
+              },
+            }}
           >
             {loading ? 'Loading...' : `Load More (${pagination.totalLoaded} loaded)`}
           </Button>

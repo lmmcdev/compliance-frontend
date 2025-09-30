@@ -189,15 +189,6 @@ const Layout = ({ children }: LayoutProps) => {
                         '&.Mui-selected': {
                           backgroundColor: '#DFF3FF',
                           color: '#00A1FF',
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: '3px',
-                            backgroundColor: '#00A1FF',
-                          },
                           '&:hover': {
                             backgroundColor: '#BAE7FF',
                           },
@@ -333,16 +324,21 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Top Bar */}
         {isAuthenticated && (
           <Box sx={{
-            height: '64px',
+            height: '65px',
+            minHeight: '65px',
+            maxHeight: '65px',
             display: 'flex',
             alignItems: 'center',
             background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
             borderBottom: '1px solid #e2e8f0',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-            width: '100%',
-            position: 'relative',
-            left: 0,
+            width: isAuthenticated && !isMobile ? `calc(100vw - ${currentDrawerWidth}px)` : '100vw',
+            position: 'fixed',
+            left: isAuthenticated && !isMobile ? `${currentDrawerWidth}px` : 0,
             top: 0,
+            zIndex: 1100,
+            flexShrink: 0,
+            transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1), left 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           }}>
             {/* Mobile Menu Button - Only visible on mobile */}
             {isMobile && (
@@ -523,6 +519,7 @@ const Layout = ({ children }: LayoutProps) => {
           maxWidth: 'none',
           padding: 0,
           margin: 0,
+          paddingTop: isAuthenticated ? '65px' : 0,
         }}>
           {children}
         </Box>
