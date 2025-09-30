@@ -110,6 +110,14 @@ const { uploadFile, uploadProgress, uploadError } = useFileUpload();
 - Progress tracking
 - Validation and error handling
 - Temporary file upload to Azure
+- Document extraction webhook integration
+
+**`licenseExtractionService.ts`** - License extraction parsing ✨NEW
+- Parses nested extraction responses from document analysis
+- Handles multiple response format variations
+- Validates extracted data integrity
+- Provides utility functions (filtering, grouping, field statistics)
+- Type-safe field extraction with confidence scores
 
 ## Component Systems
 
@@ -245,36 +253,58 @@ Features:
 - **Responsive design** that works on all screen sizes
 - **Seamless integration** with edit workflows
 
-**`UploadLicenseWizard`** - Comprehensive 4-step license upload wizard
+**`AddLicenseDialog/`** - Modular 4-step license upload wizard ✨REFACTORED
+
+**Architecture - Clean Separation of Concerns:**
+```
+AddLicenseDialog/
+├── AddLicenseDialog.tsx          # Container (230 lines)
+├── WizardSteps/
+│   ├── AccountSelectionStep.tsx  # Step 1: Account selection
+│   ├── FileUploadStep.tsx        # Step 2: Document upload
+│   ├── ExtractedFieldsStep.tsx   # Step 3: Field review
+│   └── ConfirmationStep.tsx      # Step 4: Final confirmation
+└── DocumentPreview/
+    └── DocumentPreviewPanel.tsx  # Live document viewer
+```
+
+**Usage:**
 ```typescript
-<UploadLicenseWizard
-  open={uploadWizardOpen}
-  onClose={() => setUploadWizardOpen(false)}
-  onSuccess={handleUploadSuccess}
+<AddLicenseDialog
+  open={addDialogOpen}
+  onClose={() => setAddDialogOpen(false)}
+  onSave={handleSaveLicense}
 />
 ```
 
 **4-Step Workflow**:
-1. **Account Selection** - Choose account using integrated AccountSelection component
-2. **File Upload** - Upload license documents via /files/temp-upload endpoint with drag-and-drop support
-3. **Dynamic Form** - Auto-generated form based on temp-upload response for different license types
-4. **License Creation** - Final processing and creation with visual confirmation
+1. **Account Selection** - Choose account with searchable dropdown
+2. **File Upload** - Drag-and-drop document upload with instant preview
+3. **Review & Edit** - Review extracted fields with confidence scores and metadata
+4. **Confirmation** - Final review and submission
 
 **Key Features**:
-- **Wide dialog design** (1000px max-width, 95vw, 90vh) for optimal viewing
-- **Visual stepper navigation** with Material-UI icons and progress indicators
-- **Dynamic form generation** based on license type detection from uploaded documents
-- **Reuses existing components** (AccountSelection, FileUpload, FormBuilder)
-- **Professional error handling** with user-friendly messages and retry options
-- **Loading states** throughout the entire workflow
-- **Success confirmation** with license summary and auto-close functionality
-- **Modern UI styling** with gradients, shadows, and responsive design
-- **Centralized service integration** using licenseService and fileUploadService
+- ✅ **Modular architecture** - Each step is a separate component
+- ✅ **Business logic extracted** - All logic in `useAddLicenseWizard` hook
+- ✅ **Live document preview** - Side-by-side PDF/image viewer with zoom controls
+- ✅ **Smart extraction** - Parses `analyzeResult` metadata (modelId, apiVersion, documentsCount)
+- ✅ **Expandable field details** - Shows confidence, type, page, category, bounding box, etc.
+- ✅ **Professional UI** - 1400px wide split-panel layout (content + preview)
+- ✅ **Type-safe** - Full TypeScript coverage with proper interfaces
+- ✅ **Testable** - Business logic separated for easy unit testing
+- ✅ **Reusable hooks** - `useDocumentPreview` for preview management
+
+**Technical Architecture:**
+- **Presentation Layer**: Small focused components (~50-100 lines each)
+- **Business Logic**: `useAddLicenseWizard` hook manages all state and operations
+- **Service Layer**: `licenseExtractionService` processes extraction responses
+- **Utility Hooks**: `useDocumentPreview` manages preview state and zoom
 
 **Integration**:
-- Seamlessly integrated into LicensesPage with dedicated "Upload License" button
-- Automatic license list refresh upon successful upload
-- Compatible with existing license management workflow
+- Integrated into LicensesPage with "Add License" button
+- Automatic license list refresh upon successful creation
+- Uses existing `AccountSelection` and `ExtractedFieldsForm` components
+- Leverages `fileUploadService` and `licenseExtractionService`
 
 ### Working Hours System (`src/utils/workingHoursCalculator.ts`)
 
