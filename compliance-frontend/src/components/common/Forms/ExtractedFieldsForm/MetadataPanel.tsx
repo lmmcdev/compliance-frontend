@@ -7,14 +7,16 @@ import {
   LinearProgress,
   Chip,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import {
   Description as FileIcon,
   Info as InfoIcon,
   VerifiedUser as VerifiedIcon,
-  Source as ModelIcon,
+  Psychology as ModelIcon,
   Api as ApiIcon,
   DocumentScanner as DocumentIcon,
+  Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 import type { MetadataPanelProps } from './types';
 
@@ -49,39 +51,95 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
+        p: 3,
         mb: 3,
-        bgcolor: 'primary.50',
-        border: '1px solid',
-        borderColor: 'primary.200',
-        borderRadius: 2,
+        bgcolor: 'background.paper',
+        border: '2px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
       }}
     >
-      <Grid container spacing={2} alignItems="center">
+      <Grid container spacing={3} alignItems="center">
         {/* Document Type */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FileIcon color="primary" />
-            <Box>
-              <Typography variant="caption" color="text.secondary" display="block">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: 'primary.50',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: 'primary.main',
+                borderRadius: 2,
+                p: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <FileIcon sx={{ color: 'white', fontSize: 24 }} />
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500, mb: 0.5 }}>
                 Document Type
               </Typography>
-              <Typography variant="body2" fontWeight={600}>
-                {modelId || metadata.licenseType || metadata.documentType || 'General License'}
-              </Typography>
+              <Tooltip
+                title={modelId || metadata.licenseType || metadata.documentType || 'General License'}
+                arrow
+                placement="top"
+              >
+                <Typography
+                  variant="body1"
+                  fontWeight={700}
+                  color="primary.main"
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                  }}
+                >
+                  {modelId || metadata.licenseType || metadata.documentType || 'General License'}
+                </Typography>
+              </Tooltip>
             </Box>
           </Box>
         </Grid>
 
         {/* Fields Extracted Count */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <InfoIcon color="primary" />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: 'info.50',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: 'info.main',
+                borderRadius: 2,
+                p: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <InfoIcon sx={{ color: 'white', fontSize: 24 }} />
+            </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary" display="block">
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500, mb: 0.5 }}>
                 Fields Extracted
               </Typography>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography variant="body1" fontWeight={700} color="info.main">
                 {fieldsCount} {fieldsCount === 1 ? 'field' : 'fields'}
               </Typography>
             </Box>
@@ -91,20 +149,41 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
         {/* Overall Confidence Score */}
         {metadata.confidence !== undefined && (
           <Grid size={{ xs: 12, md: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <VerifiedIcon color="success" />
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 2,
+                borderRadius: 2,
+                bgcolor: 'success.50',
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: getConfidenceColor(metadata.confidence) === 'success' ? 'success.main' :
+                           getConfidenceColor(metadata.confidence) === 'warning' ? 'warning.main' : 'error.main',
+                  borderRadius: 2,
+                  p: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <VerifiedIcon sx={{ color: 'white', fontSize: 24 }} />
+              </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500, mb: 0.5 }}>
                   Overall Confidence
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   <LinearProgress
                     variant="determinate"
                     value={metadata.confidence * 100}
-                    sx={{ flex: 1, height: 6, borderRadius: 3 }}
+                    sx={{ flex: 1, height: 8, borderRadius: 4 }}
                     color={getConfidenceColor(metadata.confidence)}
                   />
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body1" fontWeight={700} color={`${getConfidenceColor(metadata.confidence)}.main`}>
                     {Math.round(metadata.confidence * 100)}%
                   </Typography>
                 </Box>
@@ -120,7 +199,7 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({
           <Divider sx={{ my: 2 }} />
           <Box>
             <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
-              <ModelIcon fontSize="small" />
+              <AnalyticsIcon fontSize="small" />
               Analysis Details
             </Typography>
             <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>

@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Typography, Paper, CircularProgress, Chip, IconButton, Fade } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, Chip, IconButton, Fade, keyframes } from '@mui/material';
 import {
   Visibility as PreviewIcon,
   Description as DocumentIcon,
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   FullscreenOutlined as FullscreenIcon,
+  CloudUpload as UploadIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -27,6 +28,24 @@ const PreviewHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
 }));
+
+const float = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+`;
+
+const pulse = keyframes`
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+`;
 
 const PreviewContainer = styled(Box)(() => ({
   flex: 1,
@@ -98,10 +117,19 @@ export const DocumentPreviewPanel: React.FC<DocumentPreviewPanelProps> = ({
         </PreviewHeader>
         <PreviewContainer>
           <Box sx={{ textAlign: 'center', color: '#94a3b8' }}>
-            <DocumentIcon sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
-            <Typography variant="body1">No document uploaded</Typography>
-            <Typography variant="body2" sx={{ mt: 1, opacity: 0.7 }}>
-              Upload a document to see the preview
+            <UploadIcon
+              sx={{
+                fontSize: 80,
+                mb: 3,
+                opacity: 0.3,
+                animation: `${float} 3s ease-in-out infinite`,
+              }}
+            />
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#cbd5e1' }}>
+              No document uploaded
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300, mx: 'auto' }}>
+              Upload a document in the next step to see a live preview here
             </Typography>
           </Box>
         </PreviewContainer>
@@ -148,8 +176,13 @@ export const DocumentPreviewPanel: React.FC<DocumentPreviewPanelProps> = ({
         <PreviewContainer>
           {uploading ? (
             <Box sx={{ textAlign: 'center', color: '#94a3b8' }}>
-              <CircularProgress size={48} sx={{ mb: 2 }} />
-              <Typography variant="body1">Processing document...</Typography>
+              <CircularProgress size={48} sx={{ mb: 2, color: '#10b981' }} />
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#cbd5e1', mb: 1 }}>
+                Processing document...
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.7, animation: `${pulse} 2s ease-in-out infinite` }}>
+                This may take a few seconds
+              </Typography>
             </Box>
           ) : fileType.isPDF ? (
             <iframe

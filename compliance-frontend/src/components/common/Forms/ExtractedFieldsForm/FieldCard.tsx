@@ -69,16 +69,24 @@ export const FieldCard: React.FC<FieldCardProps> = ({
 
   return (
     <Paper
-      elevation={1}
+      elevation={0}
       sx={{
         p: 2.5,
-        borderRadius: 2,
-        transition: 'all 0.2s',
+        borderRadius: 3,
         border: '2px solid',
-        borderColor: 'transparent',
-        '&:hover': {
-          borderColor: 'primary.light',
-          boxShadow: 3,
+        borderColor: 'divider',
+        background: 'linear-gradient(to bottom right, #ffffff 0%, #f8f9fa 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '4px',
+          height: '100%',
+          bgcolor: confidenceInfo.color === 'success' ? 'success.main' :
+                   confidenceInfo.color === 'warning' ? 'warning.main' : 'error.main',
         },
       }}
     >
@@ -125,9 +133,13 @@ export const FieldCard: React.FC<FieldCardProps> = ({
         value={field.confidence * 100}
         sx={{
           mb: 2,
-          height: 4,
-          borderRadius: 2,
-          bgcolor: 'grey.200',
+          height: 6,
+          borderRadius: 3,
+          bgcolor: 'grey.100',
+          '& .MuiLinearProgress-bar': {
+            borderRadius: 3,
+            transition: 'transform 0.4s ease',
+          },
         }}
         color={confidenceInfo.color}
       />
@@ -141,12 +153,20 @@ export const FieldCard: React.FC<FieldCardProps> = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={`Enter ${fieldLabel.toLowerCase()}`}
         variant="outlined"
-        size="small"
+        size="medium"
         disabled={disabled}
         InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
         sx={{
           '& .MuiOutlinedInput-root': {
-            bgcolor: 'background.paper',
+            bgcolor: 'white',
+            borderRadius: 2,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            },
+            '&.Mui-focused': {
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+            },
           },
         }}
       />

@@ -1,7 +1,7 @@
 import  { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Box, Typography, Container, Paper } from '@mui/material';
-import { PieChart as PieChartIcon, BarChart as BarChartIcon, Timeline as TimelineIcon } from '@mui/icons-material';
+import { Box, Typography, Container, Paper, Chip } from '@mui/material';
+import { PieChart as PieChartIcon, BarChart as BarChartIcon, Timeline as TimelineIcon, CalendarToday as CalendarIcon, Warning as WarningIcon } from '@mui/icons-material';
 import StatusCard from '../common/Dashboard/StatusCard';
 import type { License } from '../../types';
 
@@ -12,6 +12,7 @@ interface DashboardMetrics {
   licensesByType: { name: string; count: number }[];
   expiringLicenses: License[];
   complianceCasesByMonth: { month: string; count: number }[];
+  expiringLicensesTimeline: { period: string; count: number; urgency: 'critical' | 'warning' | 'normal' }[];
   totalLicenses: number;
   totalComplianceCases: number;
 }
@@ -39,6 +40,14 @@ const Dashboard = () => {
         { month: 'Apr', count: 15 },
         { month: 'May', count: 22 },
         { month: 'Jun', count: 18 },
+      ],
+      expiringLicensesTimeline: [
+        { period: 'This Week', count: 8, urgency: 'critical' },
+        { period: 'Next Week', count: 12, urgency: 'critical' },
+        { period: 'Week 3', count: 15, urgency: 'warning' },
+        { period: 'Week 4', count: 10, urgency: 'warning' },
+        { period: 'Month 2', count: 25, urgency: 'warning' },
+        { period: 'Month 3', count: 18, urgency: 'normal' },
       ],
       totalLicenses: DEFAULT_TOTAL_LICENSES,
       totalComplianceCases: 94,
@@ -202,13 +211,13 @@ const Dashboard = () => {
         ))}
       </Box>
 
-      {/* Charts Section */}
+      {/* Charts Section - Row 1 */}
       <Box sx={{
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
         gap: 4,
         width: '100%',
-        mb: 5
+        mb: 4
       }}>
         <Paper sx={{
           p: 4,
@@ -420,36 +429,44 @@ const Dashboard = () => {
         </Paper>
       </Box>
 
-      <Paper sx={{
-        p: 4,
-        borderRadius: '20px',
-        border: 'none',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-        backgroundColor: '#ffffff',
-        background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
-        }
+      {/* Charts Section - Row 2 */}
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+        gap: 4,
+        width: '100%',
+        mb: 4
       }}>
-        <Typography variant="h5" sx={{
-          fontWeight: 700,
-          color: '#1e293b',
-          mb: 3,
-          fontSize: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.5
+        <Paper sx={{
+          p: 4,
+          borderRadius: '20px',
+          border: 'none',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+          backgroundColor: '#ffffff',
+          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+          }
         }}>
-          <TimelineIcon sx={{
-            fontSize: '28px',
-            color: '#f093fb',
-            filter: 'drop-shadow(0 2px 4px rgba(240, 147, 251, 0.3))'
-          }} />
-          Compliance Cases per Month
-        </Typography>
-        <ResponsiveContainer width="100%" height={400}>
+          <Typography variant="h5" sx={{
+            fontWeight: 700,
+            color: '#1e293b',
+            mb: 3,
+            fontSize: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5
+          }}>
+            <TimelineIcon sx={{
+              fontSize: '28px',
+              color: '#f093fb',
+              filter: 'drop-shadow(0 2px 4px rgba(240, 147, 251, 0.3))'
+            }} />
+            Compliance Cases per Month
+          </Typography>
+          <ResponsiveContainer width="100%" height={400}>
           <LineChart
             data={metrics.complianceCasesByMonth}
             margin={{ top: 30, right: 30, left: 20, bottom: 30 }}
@@ -525,6 +542,178 @@ const Dashboard = () => {
           </LineChart>
         </ResponsiveContainer>
       </Paper>
+
+        {/* Expiring Licenses Timeline - Next 90 Days */}
+        <Paper sx={{
+          p: 4,
+          borderRadius: '20px',
+        border: 'none',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        backgroundColor: '#ffffff',
+        background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        }
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <CalendarIcon sx={{
+              fontSize: '28px',
+              color: '#f5576c',
+              filter: 'drop-shadow(0 2px 4px rgba(245, 87, 108, 0.3))'
+            }} />
+            <Typography variant="h5" sx={{
+              fontWeight: 700,
+              color: '#1e293b',
+              fontSize: '20px',
+            }}>
+              License Expiration Timeline (Next 90 Days)
+            </Typography>
+          </Box>
+          <Chip
+            icon={<WarningIcon />}
+            label={`${metrics.expiringLicensesTimeline.reduce((sum, item) => sum + item.count, 0)} Expiring Soon`}
+            color="error"
+            sx={{
+              fontWeight: 700,
+              fontSize: '14px',
+              px: 1,
+              boxShadow: '0 2px 8px rgba(245, 87, 108, 0.2)'
+            }}
+          />
+        </Box>
+
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={metrics.expiringLicensesTimeline}
+            layout="vertical"
+            margin={{ top: 20, right: 40, left: 20, bottom: 20 }}
+          >
+            <defs>
+              <linearGradient id="criticalGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#f5576c" />
+                <stop offset="100%" stopColor="#ff8a80" />
+              </linearGradient>
+              <linearGradient id="warningGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#FFB900" />
+                <stop offset="100%" stopColor="#ffd54f" />
+              </linearGradient>
+              <linearGradient id="normalGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#43e97b" />
+                <stop offset="100%" stopColor="#38f9d7" />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+            <XAxis
+              type="number"
+              stroke="#64748b"
+              fontSize={12}
+              fontWeight={600}
+              domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
+            />
+            <YAxis
+              type="category"
+              dataKey="period"
+              stroke="#64748b"
+              fontSize={14}
+              fontWeight={700}
+              width={100}
+              tick={{ fill: '#1e293b' }}
+              tickMargin={5}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                border: 'none',
+                borderRadius: '12px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+                backdropFilter: 'blur(10px)',
+                padding: '12px 16px'
+              }}
+              labelStyle={{
+                color: '#1e293b',
+                fontWeight: 700,
+                fontSize: '14px',
+                marginBottom: '4px'
+              }}
+              formatter={(value: number) => [`${value} licenses`, 'Expiring']}
+              cursor={false}
+            />
+            <Bar
+              dataKey="count"
+              radius={[0, 8, 8, 0]}
+              barSize={45}
+              fill="#667eea"
+            >
+              {metrics.expiringLicensesTimeline.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={
+                    entry.urgency === 'critical'
+                      ? 'url(#criticalGradient)'
+                      : entry.urgency === 'warning'
+                      ? 'url(#warningGradient)'
+                      : 'url(#normalGradient)'
+                  }
+                  style={{
+                    filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.15))',
+                  }}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+
+        {/* Legend */}
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 4,
+          mt: 3,
+          pt: 3,
+          borderTop: '1px solid #e2e8f0'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{
+              width: 16,
+              height: 16,
+              borderRadius: '4px',
+              background: 'linear-gradient(90deg, #f5576c 0%, #ff8a80 100%)',
+              boxShadow: '0 2px 4px rgba(245, 87, 108, 0.3)'
+            }} />
+            <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+              Critical (0-14 days)
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{
+              width: 16,
+              height: 16,
+              borderRadius: '4px',
+              background: 'linear-gradient(90deg, #FFB900 0%, #ffd54f 100%)',
+              boxShadow: '0 2px 4px rgba(255, 185, 0, 0.3)'
+            }} />
+            <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+              Warning (15-60 days)
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{
+              width: 16,
+              height: 16,
+              borderRadius: '4px',
+              background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+              boxShadow: '0 2px 4px rgba(67, 233, 123, 0.3)'
+            }} />
+            <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+              Normal (61-90 days)
+            </Typography>
+          </Box>
+        </Box>
+        </Paper>
+      </Box>
     </Box>
   );
 };
