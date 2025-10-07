@@ -10,6 +10,8 @@ import Dashboard from './components/Dashboard/Dashboard';
 import { LicensesPage } from './components/LicenseManagement/LicensesPage';
 import ComplianceForm from './components/ComplianceForm/ComplianceForm';
 import { IncidentsPage } from './components/Incident/IncidentsPage';
+import { IncidentAnalyticsDashboard } from './components/IncidentAnalytics/IncidentAnalyticsDashboard';
+import { PatchAnalyticsDashboard, PatchDetailsDashboard } from './components/PatchAnalytics';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -97,9 +99,33 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route 
-          path="/" 
-          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} 
+        <Route
+          path="/charts"
+          element={
+            <ProtectedRoute>
+              <IncidentAnalyticsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patch-analytics"
+          element={
+            <ProtectedRoute>
+              <PatchAnalyticsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patch-details"
+          element={
+            <ProtectedRoute>
+              <PatchDetailsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
         />
       </Routes>
     </Layout>

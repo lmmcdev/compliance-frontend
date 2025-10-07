@@ -29,6 +29,8 @@ import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   Dashboard as DashboardIcon,
+  Assessment as AssessmentIcon,
+  FindInPage as FindInPageIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -42,6 +44,8 @@ const collapsedDrawerWidth = 64;
 const menuItems = [
   { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
   { text: 'Charts', path: '/charts', icon: <ChartIcon /> },
+  { text: 'Patch Analytics', path: '/patch-analytics', icon: <AssessmentIcon /> },
+  { text: 'Patch Details', path: '/patch-details', icon: <FindInPageIcon /> },
   { text: 'People', path: '/people', icon: <PeopleIcon /> },
   { text: 'Incidents', path: '/incidents', icon: <IncidentIcon /> },
   { text: 'Licenses', path: '/licenses', icon: <LicenseIcon /> },

@@ -31,6 +31,11 @@ export {
   useIncidentOperations,
 } from './IncidentsContext';
 
+export {
+  IncidentAnalyticsProvider,
+  useIncidentAnalytics,
+} from './IncidentAnalyticsContext';
+
 // Legacy context (will be gradually replaced)
 export {
   DataProvider,

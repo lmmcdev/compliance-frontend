@@ -4,6 +4,7 @@ export { licenseService } from './licenseService';
 export { complianceService } from './complianceService';
 export { cosmosDbService } from './cosmosDbService';
 export { fileUploadService } from './fileUploadService';
+export { incidentAnalyticsService } from './incidentAnalyticsService';
 
 // Export types
 export type { Account, ApiResponse, AccountsData, AccountsListResponse } from './accountsService';

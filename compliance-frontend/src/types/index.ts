@@ -47,3 +47,6 @@ export interface DashboardMetrics {
   totalLicenses: number;
   totalComplianceCases: number;
 }
+
+// Export incident analytics types
+export * from './incidentAnalytics';
